@@ -67,4 +67,20 @@ public class Artist {
     public String toString() {
         return firstname + " " + lastname;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setFirstname(@NotBlank(message = "The firstname must not be empty.") @Size(min = 2, max = 60, message = "The firstname must be between 2 and 60 characters long.") String firstname) {
+        this.firstname = firstname;
+    }
+
+    public void setLastname(@NotBlank(message = "The lastname must not be empty.") @Size(min = 2, max = 60, message = "The firstname must be between 2 and 60 characters long.") String lastname) {
+        this.lastname = lastname;
+    }
+
+    public void setTypes(List<Type> types) {
+        this.types = types;
+    }
 }
