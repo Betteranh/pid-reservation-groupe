@@ -1,5 +1,8 @@
 package be.iccbxl.pid.reservationsspringboot.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,6 +25,8 @@ public class Type {
             name = "artist_type",
             joinColumns = @JoinColumn(name = "type_id"),
             inverseJoinColumns = @JoinColumn(name = "artist_id"))
+            
+    @JsonIgnoreProperties("artists")
     private List<Artist> artists = new ArrayList<>();
 
     public List<Artist> getArtists() {

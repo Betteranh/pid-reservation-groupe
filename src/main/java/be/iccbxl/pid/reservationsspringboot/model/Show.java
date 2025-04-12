@@ -1,5 +1,9 @@
 package be.iccbxl.pid.reservationsspringboot.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.github.slugify.Slugify;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -11,6 +15,8 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "shows")
+@JsonIgnoreProperties({"artistTypes", "reviews", "hibernateLazyInitializer"})
+
 public class Show {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -30,6 +36,9 @@ public class Show {
      */
     @ManyToOne
     @JoinColumn(name = "location_id", nullable = true)
+    @JsonBackReference("location-shows") // Ajouter cette annotation
+
+
     private Location location;
 
     private boolean bookable;
@@ -53,12 +62,18 @@ public class Show {
     private LocalDateTime updatedAt;
 
     @OneToMany(targetEntity = Representation.class, mappedBy = "show")
+    @JsonManagedReference("show-representations")
+
     private List<Representation> representations = new ArrayList<>();
 
     @ManyToMany(mappedBy = "shows")
+    @JsonIgnore
+
     private List<ArtistType> artistTypes = new ArrayList<>();
 
     @OneToMany(mappedBy = "show", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+
     private List<Review> reviews = new ArrayList<>();
 
 
@@ -123,13 +138,15 @@ public class Show {
     public Location getLocation() {
         return location;
     }
-
     public void setLocation(Location location) {
-        this.location.removeShow(this);    //déménager de l’ancien lieu
+        if (this.location != null) {
+            this.location.removeShow(this);    //déménager de l'ancien lieu
+        }
         this.location = location;
-        this.location.addShow(this);        //emménager dans le nouveau lieu
+        if (location != null) {
+            location.addShow(this);        //emménager dans le nouveau lieu
+        }
     }
-
     public boolean isBookable() {
         return bookable;
     }

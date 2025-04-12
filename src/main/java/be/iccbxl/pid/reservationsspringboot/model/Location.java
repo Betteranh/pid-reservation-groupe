@@ -1,5 +1,7 @@
 package be.iccbxl.pid.reservationsspringboot.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.github.slugify.Slugify;
 import jakarta.persistence.*;
 
@@ -26,8 +28,9 @@ public class Location {
     private String website;
     private String phone;
 
-    @OneToMany(targetEntity = Show.class, mappedBy = "location")
-    private List<Show> shows = new ArrayList<>();
+  @OneToMany(targetEntity = Show.class, mappedBy = "location")
+@JsonManagedReference("location-shows")
+private List<Show> shows = new ArrayList<>();
 
     @OneToMany(targetEntity = Representation.class, mappedBy = "location")
     private List<Representation> representations = new ArrayList<>();
