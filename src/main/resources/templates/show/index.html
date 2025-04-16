@@ -13,6 +13,23 @@
             <h1 class="text-4xl font-extrabold text-gray-900" th:text="${title}">Liste des spectacles</h1>
         </div>
 
+        <!-- Recherche par tag -->
+        <form method="get" th:action="@{/shows}" class="mb-6 flex gap-3 items-center">
+            <label for="tag" class="text-gray-700">Rechercher par mot-clé :</label>
+            <select id="tag" name="tag" class="border rounded px-3 py-1">
+                <option value="">-- Tous les spectacles --</option>
+                <option th:each="tag : ${availableTags}" th:value="${tag.tag}" th:text="${tag.tag}"
+                        th:selected="${param.tag == tag.tag}"></option>
+            </select>
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                Rechercher
+            </button>
+        </form>
+
+        <p th:if="${resultCount != null}" class="text-sm text-gray-600 italic mb-4">
+            <span th:text="${resultCount}">x</span> résultat(s) trouvé(s)
+        </p>
+
         <!-- Grid des spectacles -->
         <div th:if="${shows != null and !#lists.isEmpty(shows)}"
              class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

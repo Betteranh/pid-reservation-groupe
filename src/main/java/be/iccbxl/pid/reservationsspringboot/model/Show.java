@@ -6,7 +6,9 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
@@ -61,6 +63,13 @@ public class Show {
     @OneToMany(mappedBy = "show", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
 
+    @ManyToMany
+    @JoinTable(
+            name = "show_tag",
+            joinColumns = @JoinColumn(name = "show_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private Set<Tag> tags = new HashSet<>();
 
     public Show() {
     }
@@ -180,6 +189,13 @@ public class Show {
         }
 
         return this;
+    }
+
+    public Set<Tag> getTags() {
+        if (this.tags == null) {
+            this.tags = new HashSet<>();
+        }
+        return tags;
     }
 
     /**

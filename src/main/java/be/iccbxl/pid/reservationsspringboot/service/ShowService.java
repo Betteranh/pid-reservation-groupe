@@ -2,6 +2,7 @@ package be.iccbxl.pid.reservationsspringboot.service;
 
 import be.iccbxl.pid.reservationsspringboot.model.Location;
 import be.iccbxl.pid.reservationsspringboot.model.Show;
+import be.iccbxl.pid.reservationsspringboot.model.Tag;
 import be.iccbxl.pid.reservationsspringboot.repository.ShowRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,8 +46,25 @@ public class ShowService {
         repository.deleteById(indice);
     }
 
+    public void save(Show show) {
+        repository.save(show);
+    }
+
+    public List<Show> getByTag(Tag tag) {
+        return repository.findByTagsContaining(tag);
+    }
+
     public List<Show> getFromLocation(Location location) {
         return repository.findByLocation(location);
+    }
+
+    public Show getWithAssociations(String id) {
+        Long indice = Long.parseLong(id);
+        return repository.findByIdWithAssociations(indice).orElse(null);
+    }
+
+    public List<Show> getWithoutTag(Tag tag) {
+        return repository.findByTagsNotContaining(tag);
     }
 
 }

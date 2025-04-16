@@ -107,6 +107,51 @@
             </div>
         </div>
 
+        <!-- Mots-clés -->
+        <div class="mb-10">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Mots-clés associés</h2>
+
+            <!-- Liste des mots-clés -->
+            <div th:if="${show.tags != null and !#lists.isEmpty(show.tags)}" class="flex flex-wrap gap-2">
+                <a th:each="tag : ${show.tags}"
+                   th:href="@{/shows(tag=${tag.tag})}"
+                   th:text="${tag.tag}"
+                   class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium hover:bg-yellow-200">
+                    Mot-clé
+                </a>
+            </div>
+            <p th:if="${#lists.isEmpty(show.tags)}" class="text-gray-500 italic">Aucun mot-clé pour ce spectacle.</p>
+
+            <!-- Exclure ce mot-clé -->
+            <div sec:authorize="hasRole('ADMIN')" class="mt-3 text-sm text-gray-600">
+                <p class="italic">Voir les spectacles sans ce mot-clé :</p>
+                <ul class="flex gap-2 flex-wrap mt-1">
+                    <li th:each="tag : ${show.tags}">
+                        <a th:href="@{/shows/exclude-tag/{tag}(tag=${tag.tag})}"
+                           th:text="'Sans ' + ${tag.tag}"
+                           class="text-xs text-red-500 hover:underline">
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Formulaire d’ajout (admin uniquement) -->
+        <div class="mb-10" sec:authorize="hasRole('ADMIN')">
+            <h3 class="text-lg font-semibold text-gray-700 mb-2">Ajouter un mot-clé</h3>
+            <form th:action="@{/shows/{id}/tags(id=${show.id})}" method="post" class="flex items-center gap-4">
+                <select name="tagId" required
+                        class="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="" disabled selected>Choisir un mot-clé</option>
+                    <option th:each="tag : ${availableTags}" th:value="${tag.id}" th:text="${tag.tag}"></option>
+                </select>
+                <button type="submit"
+                        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+                    Ajouter
+                </button>
+            </form>
+        </div>
+
         <!-- Retour -->
         <div class="text-sm">
             <a th:href="@{/shows}" class="text-blue-600 hover:underline">&larr; Retour à la liste</a>
