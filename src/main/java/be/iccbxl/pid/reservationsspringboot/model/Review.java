@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Table(name = "reviews")
 public class Review {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
@@ -32,4 +32,14 @@ public class Review {
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+    private boolean validated; // Ajoutez ce champ
+
+
+    public Object getValidated() {
+        return validated;
+    }
+
+    public void setValidated(Object validated) {
+        this.validated = (boolean) validated;
+    }
 }

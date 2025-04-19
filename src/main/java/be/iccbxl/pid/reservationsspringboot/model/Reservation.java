@@ -14,7 +14,7 @@ import java.util.List;
 @Table(name = "reservations")
 public class Reservation {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
@@ -29,5 +29,7 @@ public class Reservation {
 
     @OneToMany(mappedBy = "reservation")
     private List<RepresentationReservation> representationReservations = new ArrayList<>();
+
+    
 
 }

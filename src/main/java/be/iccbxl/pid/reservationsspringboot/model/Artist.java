@@ -1,5 +1,8 @@
 package be.iccbxl.pid.reservationsspringboot.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -14,7 +17,7 @@ import java.util.List;
 @Table(name = "artists")
 public class Artist {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank(message = "The firstname must not be empty.")
@@ -26,6 +29,8 @@ public class Artist {
     private String lastname;
 
     @ManyToMany(mappedBy = "artists")
+    @JsonIgnoreProperties("artists")
+
     private List<Type> types = new ArrayList<>();
 
     // Problème avec lombok !

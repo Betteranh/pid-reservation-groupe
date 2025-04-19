@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "representation_reservations")
 public class RepresentationReservation {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
