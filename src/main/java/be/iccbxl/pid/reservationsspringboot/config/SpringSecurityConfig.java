@@ -33,7 +33,7 @@ public class SpringSecurityConfig {
     public SecurityFilterChain configure(final HttpSecurity http) throws Exception {
         return http.cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf
-                    .ignoringRequestMatchers("/api/public/**")  // Ajouter cette ligne pour ignorer CSRF pour les endpoints publics
+                    .ignoringRequestMatchers("/api/public/**")
                     .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                     .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
                 )
@@ -42,12 +42,22 @@ public class SpringSecurityConfig {
                     auth.requestMatchers("/user").hasRole("member");
                     
                     //API
-                    auth.requestMatchers("/api/public/**").permitAll(); // Endpoints publics
-                    auth.requestMatchers("/api/admin/**").hasRole("admin"); // Endpoints réservés aux administrateurs
+                    auth.requestMatchers("/api/public/**").permitAll();
+                    auth.requestMatchers("/api/admin/**").hasRole("admin");
     
                     auth.anyRequest().permitAll();
                 })
-                // Reste de la configuration inchangé
+                .formLogin(form -> form
+                    .loginPage("/login")
+                    .loginProcessingUrl("/login") // URL pour traiter la soumission du formulaire
+                    .defaultSuccessUrl("/", true)
+                    .failureUrl("/login?loginError=true")
+                    .permitAll()
+                )
+                .logout(logout -> logout
+                    .logoutSuccessUrl("/login?logoutSuccess=true")
+                    .permitAll()
+                )
                 .build();
     }
     
