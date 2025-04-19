@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 @Table(name = "representations")
 public class Representation {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
     @JoinColumn(name = "show_id", nullable = false)
