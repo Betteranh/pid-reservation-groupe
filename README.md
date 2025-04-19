@@ -7,6 +7,7 @@ Ce projet a été réalisé dans le cadre du cours Projet d'intégration de Dév
 ## Membres du groupe de travail:
 
 - Aktan Stéphane
+- Amankour Mohamed
 - Bah Elhadj S.
 - Dugic Nermina
 - Nguyen Duy Anh
@@ -58,5 +59,8 @@ Ce projet a été réalisé dans le cadre du cours Projet d'intégration de Dév
    mvn spring-boot:run
 5. **Accéder à l'application :**
    Ouvrez http://localhost:8080 dans votre navigateur.
+
+6. **Partie front-end en cour (vue.js)**
+   https://github.com/CyberAkr/pid-reservation-grp-front
 
 
