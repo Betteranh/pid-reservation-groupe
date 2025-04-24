@@ -29,6 +29,31 @@ public class Representation {
     @JoinColumn(name = "location_id", nullable = true)
     private Location location;
 
+    /**
+     * Jauge mise en vente (peut être null → on tombera sur location.capacity)
+     */
+    @Column(nullable = false)
+    private Integer capacity;
+
+    public List<RepresentationReservation> getItems() {
+        return items;
+    }
+
+    public void setItems(List<RepresentationReservation> items) {
+        this.items = items;
+    }
+
+    @OneToMany(mappedBy = "representation", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<RepresentationReservation> items = new ArrayList<>();
+
+    public Integer getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(Integer capacity) {
+        this.capacity = capacity;
+    }
+
     @ManyToMany
     @JoinTable(
             name = "reservations",
@@ -93,6 +118,33 @@ public class Representation {
         }
 
         return this;
+    }
+
+    /**
+     * Capacité effective : soit la capacité propre, soit celle du lieu
+     */
+    @Transient
+    public int getEffectiveCapacity() {
+        if (capacity != null) return capacity;
+        return (location != null ? location.getCapacity() : 0);
+    }
+
+    /**
+     * Somme des quantités déjà réservées
+     */
+    @Transient
+    public int getBookedSeats() {
+        return items.stream()
+                .mapToInt(RepresentationReservation::getQuantity)
+                .sum();
+    }
+
+    /**
+     * Places restantes
+     */
+    @Transient
+    public int getAvailableSeats() {
+        return getEffectiveCapacity() - getBookedSeats();
     }
 
     @Override

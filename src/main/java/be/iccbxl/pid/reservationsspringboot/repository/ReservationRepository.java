@@ -1,9 +1,14 @@
 package be.iccbxl.pid.reservationsspringboot.repository;
 
 import be.iccbxl.pid.reservationsspringboot.model.Reservation;
+import be.iccbxl.pid.reservationsspringboot.model.User;
 import org.springframework.data.repository.CrudRepository;
+
+import java.util.List;
 
 
 public interface ReservationRepository extends CrudRepository<Reservation, Long> {
-    // Implémenter les méthodes de recherche...
+    List<Reservation> findByUser(User user);
+
+    List<Reservation> findByUser_Id(Long userId);
 }

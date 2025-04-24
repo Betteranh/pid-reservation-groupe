@@ -14,7 +14,7 @@ import java.util.List;
 @Table(name = "reservations")
 public class Reservation {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
@@ -27,7 +27,21 @@ public class Reservation {
     @Column(length = 60)
     private String status;
 
-    @OneToMany(mappedBy = "reservation")
-    private List<RepresentationReservation> representationReservations = new ArrayList<>();
+    @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RepresentationReservation> items = new ArrayList<>();
 
+    public void addItem(RepresentationReservation item) {
+        items.add(item);
+        item.setReservation(this);
+    }
+
+    /**
+     * Montant total de la réservation : somme de price × quantity
+     */
+    @Transient
+    public double getTotal() {
+        return items.stream()
+                .mapToDouble(item -> item.getPrice().getPrice() * item.getQuantity())
+                .sum();
+    }
 }

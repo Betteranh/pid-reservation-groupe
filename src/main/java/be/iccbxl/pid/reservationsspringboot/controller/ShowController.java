@@ -81,6 +81,14 @@ public class ShowController {
             }
         }
 
+        // 1) INITIALISER les reservations de CHAQUE représentation
+        show.getRepresentations().forEach(rep -> Hibernate.initialize(rep.getItems()));
+
+        // 2) déterminer si au moins une représentation est encore bookable
+        boolean canBook = show.getRepresentations().stream()
+                .anyMatch(r -> r.getAvailableSeats() > 0);
+
+        model.addAttribute("canBook", canBook);
         model.addAttribute("collaborateurs", collaborateurs);
         model.addAttribute("availableTags", tagService.findAll());
         model.addAttribute("show", show);

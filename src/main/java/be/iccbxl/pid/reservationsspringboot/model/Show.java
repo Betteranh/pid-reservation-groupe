@@ -139,8 +139,12 @@ public class Show {
         this.location.addShow(this);        //emménager dans le nouveau lieu
     }
 
+    /**
+     * Un spectacle est réservable si **au moins une** représentation a des places dispo
+     */
+    @Transient
     public boolean isBookable() {
-        return bookable;
+        return representations.stream().anyMatch(r -> r.getAvailableSeats() > 0);
     }
 
     public void setBookable(boolean bookable) {

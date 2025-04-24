@@ -8,10 +8,10 @@ Ce projet a été réalisé dans le cadre du cours Projet d'intégration de Dév
 
 - Aktan Stéphane
 - Bah Elhadj S.
-- Dugic Nermina
 - Nguyen Duy Anh
 - Nibigira Salix
 - El Azab Ousama
+- Amankour Mohamed 
 
 ## Fonctionnalités Principales
 
@@ -57,6 +57,10 @@ Ce projet a été réalisé dans le cadre du cours Projet d'intégration de Dév
    ```bash
    mvn spring-boot:run
 5. **Accéder à l'application :**
-   Ouvrez http://localhost:8080 dans votre navigateur.
+- Ouvrez http://localhost:8080 dans votre navigateur.
+- https://pid-reservation.onrender.com/
+6. **Front-end en cours (Vue.js) :**
+   https://github.com/CyberAkr/pid-reservation-grp-front
+
 
 
