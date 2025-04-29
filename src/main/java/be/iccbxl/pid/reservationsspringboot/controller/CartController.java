@@ -5,6 +5,9 @@ import be.iccbxl.pid.reservationsspringboot.repository.PriceRepository;
 import be.iccbxl.pid.reservationsspringboot.repository.RepresentationRepository;
 import be.iccbxl.pid.reservationsspringboot.repository.UserRepository;
 import be.iccbxl.pid.reservationsspringboot.service.ReservationService;
+import be.iccbxl.pid.reservationsspringboot.service.StripeService; // ✅ IMPORT pour Stripe
+import com.stripe.model.checkout.Session; // ✅ IMPORT pour Stripe Session
+import com.stripe.param.checkout.SessionCreateParams; // ✅ IMPORT pour Stripe Session Params
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -14,10 +17,14 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @SessionAttributes("cart")
 public class CartController {
+    @Autowired
+    private StripeService stripeService;
 
     @Autowired
     private RepresentationRepository representationRepo;
@@ -98,10 +105,11 @@ public class CartController {
             return "redirect:/login";
         }
 
+        // ✅ 1. Créer une réservation "PENDING" et l'enregistrer en base
         Reservation reservation = new Reservation();
         reservation.setUser(user);
         reservation.setBookingDate(LocalDateTime.now());
-        reservation.setStatus("en attente");
+        reservation.setStatus("PENDING");
 
         for (CartItem item : cart.getItems()) {
             Representation rep = representationRepo.findById(item.getRepresentationId()).orElse(null);
@@ -116,11 +124,38 @@ public class CartController {
             }
         }
 
+        reservationService.save(reservation); // Enregistrer en BDD directement
+        session.setAttribute("lastReservationId", reservation.getId()); // Stocker ID dans la session
 
-        reservationService.save(reservation);
-        cart.clear();
-        session.setAttribute("lastReservationId", reservation.getId());
+        // ✅ 2. Créer la session Stripe avec les items
+        List<SessionCreateParams.LineItem> lineItems = new ArrayList<>();
 
-        return "redirect:/reservation/confirmation";
+        for (CartItem item : cart.getItems()) {
+            lineItems.add(
+                    SessionCreateParams.LineItem.builder()
+                            .setQuantity((long) item.getQuantity())
+                            .setPriceData(
+                                    SessionCreateParams.LineItem.PriceData.builder()
+                                            .setCurrency("eur")
+                                            .setUnitAmount((long) (item.getUnitPrice() * 100))
+                                            .setProductData(
+                                                    SessionCreateParams.LineItem.PriceData.ProductData.builder()
+                                                            .setName(item.getLabel())
+                                                            .build()
+                                            )
+                                            .build()
+                            )
+                            .build()
+            );
+        }
+
+        try {
+            Session sessionStripe = stripeService.createCheckoutSession(lineItems);
+            return "redirect:" + sessionStripe.getUrl();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "redirect:/cart/view?error=stripe";
+        }
     }
 }
+

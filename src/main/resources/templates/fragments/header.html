@@ -48,6 +48,11 @@
                 </div>
 
                 <div sec:authorize="isAuthenticated()" class="text-gray-300 text-sm flex items-center gap-2">
+                    <a th:href="@{/my-reservations}"
+                       class="text-sm text-gray-300 hover:text-white px-3 py-2 rounded-md">
+                        📄 Mes réservations
+                    </a>
+
                     <span>Bonjour,</span>
                     <span sec:authentication="principal.username" class="font-semibold"></span>
                     <form th:action="@{/logout}" method="post" class="ml-2">

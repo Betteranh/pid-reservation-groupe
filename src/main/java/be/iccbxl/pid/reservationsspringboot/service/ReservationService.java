@@ -48,6 +48,10 @@ public class ReservationService {
         return u.map(repository::findByUser)
                 .orElse(Collections.emptyList());
     }
+    public List<Reservation> findByUserIdAndStatus(Long userId, String status) {
+        return repository.findByUserIdAndStatus(userId, status);
+    }
+
 
     /**
      * Pour créer ou mettre à jour une réservation
@@ -56,3 +60,5 @@ public class ReservationService {
         return repository.save(reservation);
     }
 }
+
+
