@@ -1,9 +1,6 @@
 package be.iccbxl.pid.reservationsspringboot.controller;
 
-import be.iccbxl.pid.reservationsspringboot.model.Artist;
-import be.iccbxl.pid.reservationsspringboot.model.ArtistType;
-import be.iccbxl.pid.reservationsspringboot.model.Show;
-import be.iccbxl.pid.reservationsspringboot.model.Tag;
+import be.iccbxl.pid.reservationsspringboot.model.*;
 import be.iccbxl.pid.reservationsspringboot.service.ShowService;
 import be.iccbxl.pid.reservationsspringboot.service.TagService;
 import jakarta.transaction.Transactional;
@@ -12,24 +9,32 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import be.iccbxl.pid.reservationsspringboot.model.Representation;
+import be.iccbxl.pid.reservationsspringboot.repository.RepresentationRepository;
 
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+
+
 @Controller
+@SessionAttributes("cart")
 public class ShowController {
+    @ModelAttribute("cart")
+    public Cart cart() {
+        return new Cart();
+    }
+
     @Autowired
     ShowService service;
 
     @Autowired
-    TagService tagService;
+    private RepresentationRepository representationRepo;
 
     @Autowired
-    private ShowService showService;
+    TagService tagService;
 
     @GetMapping("/shows")
     public String index(@RequestParam(value = "tag", required = false) String tagLabel, Model model) {
@@ -39,7 +44,7 @@ public class ShowController {
         if (tagLabel != null && !tagLabel.isBlank()) {
             Tag tag = tagService.findByTag(tagLabel).orElse(null);
             if (tag != null) {
-                shows = showService.getByTag(tag);
+                shows = service.getByTag(tag);
                 model.addAttribute("resultCount", shows.size());
                 title += " – Mots-clés : " + tagLabel;
             } else {
@@ -47,7 +52,7 @@ public class ShowController {
                 model.addAttribute("errorMessage", "Mot-clé introuvable");
             }
         } else {
-            shows = showService.getAll();
+            shows = service.getAll();
         }
 
         model.addAttribute("shows", shows);
@@ -66,25 +71,21 @@ public class ShowController {
             return "error/404";
         }
 
-        // Forcer le chargement de la collection tags et la détacher
         Hibernate.initialize(show.getTags());
         show.setTags(new HashSet<>(show.getTags()));
 
-        // Grouper les artistes par type en éliminant les doublons
         Set<ArtistType> uniqueArtistTypes = new HashSet<>(show.getArtistTypes());
         Map<String, ArrayList<Artist>> collaborateurs = new TreeMap<>();
         for (ArtistType at : uniqueArtistTypes) {
             String type = at.getType().getType();
             ArrayList<Artist> artistes = collaborateurs.computeIfAbsent(type, k -> new ArrayList<>());
-            if (!artistes.contains(at.getArtist())) {  // évite le doublon
+            if (!artistes.contains(at.getArtist())) {
                 artistes.add(at.getArtist());
             }
         }
 
-        // 1) INITIALISER les reservations de CHAQUE représentation
         show.getRepresentations().forEach(rep -> Hibernate.initialize(rep.getItems()));
 
-        // 2) déterminer si au moins une représentation est encore bookable
         boolean canBook = show.getRepresentations().stream()
                 .anyMatch(r -> r.getAvailableSeats() > 0);
 
@@ -103,26 +104,18 @@ public class ShowController {
     public String addTagToShow(@PathVariable("id") String id,
                                @RequestParam("tagId") Long tagId,
                                RedirectAttributes redirectAttributes) {
-        // Utilisez ici getWithAssociations pour obtenir un objet complètement initialisé
-        Show show = showService.getWithAssociations(id);
+        Show show = service.getWithAssociations(id);
         Tag tag = tagService.find(tagId).orElse(null);
 
         if (show != null && tag != null) {
-            // Forcer l'initialisation de la collection, au cas où
             Hibernate.initialize(show.getTags());
-
-            // Créer une copie stable de la collection en passant par un tableau pour éviter l'itération directe
             Tag[] tagsArray = show.getTags().toArray(new Tag[0]);
-            Set<Tag> updatedTags = new HashSet<>();
-            for (Tag t : tagsArray) {
-                updatedTags.add(t);
-            }
+            Set<Tag> updatedTags = new HashSet<>(Arrays.asList(tagsArray));
 
-            // Vérifier si le tag est déjà présent dans la copie stable
             if (!updatedTags.contains(tag)) {
                 updatedTags.add(tag);
                 show.setTags(updatedTags);
-                showService.save(show);
+                service.save(show);
                 redirectAttributes.addFlashAttribute("successMessage", "Mot-clé ajouté !");
             } else {
                 redirectAttributes.addFlashAttribute("errorMessage", "Ce mot-clé est déjà associé à ce spectacle.");
@@ -142,10 +135,38 @@ public class ShowController {
             return "redirect:/shows";
         }
 
-        List<Show> shows = showService.getWithoutTag(tag);
+        List<Show> shows = service.getWithoutTag(tag);
         model.addAttribute("shows", shows);
         model.addAttribute("title", "Spectacles sans le mot-clé : " + tagLabel);
 
         return "show/index";
+    }
+
+    @PostMapping("/shows/{id}/reserve")
+    public String reserveToCart(@PathVariable("id") String id,
+                                @RequestParam Long representationId,
+                                @RequestParam Long priceId,
+                                @RequestParam int quantity,
+                                @ModelAttribute("cart") Cart cart) {
+
+        Representation rep = representationRepo.findById(representationId).orElse(null); // ✅
+        Price price = rep.getShow().getPrices().stream()
+                .filter(p -> p.getId().equals(priceId))
+                .findFirst()
+                .orElse(null);
+
+        if (rep == null || price == null) {
+            return "redirect:/shows/" + id + "?error";
+        }
+
+        CartItem item = new CartItem();
+        item.setRepresentationId(rep.getId());
+        item.setPriceId(price.getId());
+        item.setQuantity(quantity);
+        item.setLabel(rep.getWhen().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+        item.setUnitPrice(price.getPrice());
+
+        cart.addItem(item);
+        return "redirect:/cart/view";
     }
 }
