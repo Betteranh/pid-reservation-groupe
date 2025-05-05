@@ -18,7 +18,7 @@ public class ArtistController {
     @Autowired
     ArtistService service;
 
-    @GetMapping("/artists")
+    @GetMapping("/dev/artists")
     public String index(Model model) {
         List<Artist> artists = service.getAllArtists();
 
@@ -28,7 +28,7 @@ public class ArtistController {
         return "artist/index";
     }
 
-    @GetMapping("/artists/{id}")
+    @GetMapping("/dev/artists/{id}")
     public String show(Model model, @PathVariable("id") long id) {
         Artist artist = service.getArtist(id);
 
@@ -38,7 +38,7 @@ public class ArtistController {
         return "artist/show";
     }
 
-    @GetMapping("/artists/{id}/edit")
+    @GetMapping("/dev/artists/{id}/edit")
     public String edit(Model model, @PathVariable long id, HttpServletRequest request) {
         Artist artist = service.getArtist(id);
 
@@ -56,7 +56,7 @@ public class ArtistController {
         return "artist/edit";
     }
 
-    @PutMapping("/artists/{id}/edit")
+    @PutMapping("/dev/artists/{id}/edit")
     public String update(@Valid @ModelAttribute Artist artist, BindingResult bindingResult,
                          @PathVariable long id, Model model, RedirectAttributes redirAttrs) {
         if (bindingResult.hasErrors()) {
@@ -77,7 +77,7 @@ public class ArtistController {
         return "redirect:/artists/" + artist.getId();
     }
 
-    @GetMapping("/artists/create")
+    @GetMapping("/dev/artists/create")
     public String create(Model model) {
         if (!model.containsAttribute("artist")) {
             model.addAttribute("artist", new Artist());
@@ -86,7 +86,7 @@ public class ArtistController {
         return "artist/create";
     }
 
-    @PostMapping("/artists/create")
+    @PostMapping("/dev/artists/create")
     public String store(@Valid @ModelAttribute Artist artist, BindingResult bindingResult,
                         Model model, RedirectAttributes redirAttrs) {
 
@@ -102,7 +102,7 @@ public class ArtistController {
         return "redirect:/artists/" + artist.getId();
     }
 
-    @DeleteMapping("/artists/{id}")
+    @DeleteMapping("/dev/artists/{id}")
     public String delete(@PathVariable long id, Model model, RedirectAttributes redirAttrs) {
         Artist existing = service.getArtist(id);
 

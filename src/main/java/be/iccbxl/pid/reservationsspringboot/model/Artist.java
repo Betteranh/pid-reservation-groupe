@@ -28,23 +28,6 @@ public class Artist {
     @ManyToMany(mappedBy = "artists")
     private List<Type> types = new ArrayList<>();
 
-    // Problème avec lombok !
-    public Long getId() {
-        return id;
-    }
-
-    public String getFirstname() {
-        return firstname;
-    }
-
-    public String getLastname() {
-        return lastname;
-    }
-
-    public List<Type> getTypes() {
-        return types;
-    }
-
     public Artist addType(Type type) {
         if (!this.types.contains(type)) {
             this.types.add(type);
