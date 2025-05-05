@@ -32,7 +32,7 @@ Ce projet a été réalisé dans le cadre du cours Projet d'intégration de Dév
 - **Base de Données :**
     - MySQL via Wampserver
 - **Frontend :**
-    - HTML, CSS, Tailwind CSS, vue.js
+    - HTML, CSS, Tailwind CSS, vue.
 
 ## Installation et Exécution
 
