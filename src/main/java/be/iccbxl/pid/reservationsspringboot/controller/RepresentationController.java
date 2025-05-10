@@ -15,7 +15,7 @@ public class RepresentationController {
     @Autowired
     RepresentationService service;
 
-    @GetMapping("/representations")
+    @GetMapping("/dev/representations")
     public String index(Model model) {
         List<Representation> representations = service.getAll();
 
@@ -25,7 +25,7 @@ public class RepresentationController {
         return "representation/index";
     }
 
-    @GetMapping("/representations/{id}")
+    @GetMapping("/dev/representations/{id}")
     public String show(Model model, @PathVariable("id") String id) {
         Representation representation = service.get(id);
 

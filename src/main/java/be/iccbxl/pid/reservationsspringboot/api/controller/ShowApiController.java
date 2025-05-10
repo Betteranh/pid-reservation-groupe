@@ -3,6 +3,7 @@ package be.iccbxl.pid.reservationsspringboot.api.controller;
 import be.iccbxl.pid.reservationsspringboot.dto.ShowDTO;
 import be.iccbxl.pid.reservationsspringboot.model.Show;
 import be.iccbxl.pid.reservationsspringboot.service.ShowService;
+import be.iccbxl.pid.reservationsspringboot.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,10 @@ public class ShowApiController {
 
     @Autowired
     private ShowService showService;
+    @Autowired
+    private TagService tagService;
+   // @Autowired
+   // private ShowMapper showMapper;
 
     // Endpoint pour récupérer tous les spectacles
     @GetMapping("/spectacles")

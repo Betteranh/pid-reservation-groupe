@@ -11,6 +11,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true)
@@ -18,11 +20,37 @@ public class SpringSecurityConfig {
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
 
+//    @Bean
+//    public WebMvcConfigurer corsConfigurer() {
+//        return new WebMvcConfigurer() {
+//            @Override
+//            public void addCorsMappings(CorsRegistry registry) {
+//                registry.addMapping("/**")
+//                        .allowedOrigins("http://localhost:8081")
+//                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+//                        .allowCredentials( true )
+//                        .allowedHeaders( "*" );
+//
+//            }
+//        };
+//    }
+
+
+
+
+
     @Bean
     public SecurityFilterChain configure(final HttpSecurity http) throws Exception {
+        System.out.println("Config de la securité en cours ...");
         return http.cors(Customizer.withDefaults())
                 .csrf(Customizer.withDefaults())
+                .csrf(csrf -> csrf.ignoringRequestMatchers( "/api/**" ))
                 .authorizeHttpRequests(auth -> {
+                    //temporaire acces au routes api
+                    auth.requestMatchers( "/api/artists/**").permitAll();
+                    auth.requestMatchers( "/api/auth/check").permitAll();
+                    auth.requestMatchers( "/api/login").permitAll();
+                    auth.requestMatchers( "/api/logout").permitAll();
                     auth.requestMatchers("/admin").hasRole("ADMIN");
                     auth.requestMatchers("/user").hasRole("MEMBER");
                     auth.anyRequest().permitAll();
@@ -42,6 +70,7 @@ public class SpringSecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http, BCryptPasswordEncoder bCryptPasswordEncoder) throws Exception {
+        System.out.println("creation de authenticationmanager ...");
         AuthenticationManagerBuilder authMngrBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
         authMngrBuilder.userDetailsService(customUserDetailsService).passwordEncoder(bCryptPasswordEncoder);
 

@@ -1,10 +1,15 @@
 <template>
-  <router-view />    <!-- ici on aura les routes des composent ( dossier components )-->
+  <MainLayout>
+    <router-view />    <!-- ici on aura les routes des composent ( dossier components )-->
+  </MainLayout>
 </template>
 
 <script>
+import MainLayout from "@/layouts/MainLayout.vue";
+
 export default {
-  name: 'App'
+  name: 'App',
+  components: {MainLayout}
 }
 </script>
 

@@ -1,6 +1,8 @@
 package be.iccbxl.pid.reservationsspringboot.api.controller;
 
 import be.iccbxl.pid.reservationsspringboot.dto.ArtistDTO;
+import be.iccbxl.pid.reservationsspringboot.dto.ArtistTypeDTO;
+import be.iccbxl.pid.reservationsspringboot.mapper.ArtistMapper;
 import be.iccbxl.pid.reservationsspringboot.model.Artist;
 import be.iccbxl.pid.reservationsspringboot.service.ArtistService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,43 +19,45 @@ public class ArtistApiController {
 
     @Autowired
     private ArtistService artistService;
+    @Autowired
+    private ArtistMapper artistMapper;
 
     // GET /api/artists
     @GetMapping("/artists")
     public List<ArtistDTO> listAll() {
         return artistService.getAllArtists().stream()
-                .map(a -> new ArtistDTO(a.getId(), a.getFirstname(), a.getLastname()))
+                .map(artistMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
     // GET /api/artists/{id}
     @GetMapping("/artists/{id}")
-    public ResponseEntity<ArtistDTO> getById(@PathVariable Long id) {
+    public ResponseEntity<ArtistTypeDTO> getById(@PathVariable Long id) {
         Artist a = artistService.getArtist(id);
         if (a == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(new ArtistDTO(a.getId(), a.getFirstname(), a.getLastname()));
+        return ResponseEntity.ok(artistMapper.toArtistTypeDTO(a));
     }
+
     @PostMapping ("/artists")
     public ResponseEntity<ArtistDTO> create(@RequestBody ArtistDTO artistDTO) {
-        Artist a = new Artist();
-        a.setFirstname( artistDTO.getFirstname() );
-        a.setLastname( artistDTO.getLastname() );
-
+        Artist a = artistMapper.toEntity(artistDTO);
         artistService.addArtist(a);
-        return ResponseEntity.ok(new ArtistDTO(a.getId(), a.getFirstname(), a.getLastname()));
+        return ResponseEntity.ok(artistMapper.toDTO(a));
+
     }
+
     @PutMapping("/artists/{id}")
-    public ResponseEntity<ArtistDTO> update(@PathVariable Long id, @RequestBody ArtistDTO artistDTO dto) {
+    public ResponseEntity<ArtistDTO> update(@PathVariable Long id, @RequestBody ArtistDTO artistDTO ) {
         Artist existing = artistService.getArtist(id);
         if (existing == null) return ResponseEntity.notFound().build();
 
         existing.setFirstname( artistDTO.getFirstname() );
         existing.setLastname( artistDTO.getLastname() );
-
         artistService.updateArtist( id, existing );
-        return ResponseEntity.ok(new ArtistDTO(existing.getId(), existing.getFirstname(), existing.getLastname()));
+
+        return ResponseEntity.ok(artistMapper.toDTO(existing));
     }
     @DeleteMapping("/artists/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
