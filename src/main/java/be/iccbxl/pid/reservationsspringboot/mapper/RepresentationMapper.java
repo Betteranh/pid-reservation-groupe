@@ -2,6 +2,7 @@ package be.iccbxl.pid.reservationsspringboot.mapper;
 
 
 import be.iccbxl.pid.reservationsspringboot.dto.RepresentationDTO;
+import be.iccbxl.pid.reservationsspringboot.dto.RepresentationDetailsDTO;
 import be.iccbxl.pid.reservationsspringboot.model.Representation;
 import org.springframework.stereotype.Component;
 
@@ -24,4 +25,31 @@ public class RepresentationMapper {
                 .map(this::toDTO)
                 .collect( Collectors.toList() );
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
+
+

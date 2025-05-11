@@ -21,8 +21,7 @@ public class ArtistApiController {
     private ArtistService artistService;
     @Autowired
     private ArtistMapper artistMapper;
-
-    // GET /api/artists
+       // GET /api/artists
     @GetMapping("/artists")
     public List<ArtistDTO> listAll() {
         return artistService.getAllArtists().stream()
