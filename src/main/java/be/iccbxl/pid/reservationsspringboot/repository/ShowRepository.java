@@ -27,4 +27,11 @@ public interface ShowRepository extends CrudRepository<Show, Long> {
 
     @Query("SELECT s FROM Show s WHERE :tag NOT MEMBER OF s.tags")
     List<Show> findByTagsNotContaining(@Param("tag") Tag tag);
+
+    @Query("SELECT DISTINCT s FROM Show s " +
+            "JOIN s.representations r " +
+            "WHERE s.bookable = true AND r.when > CURRENT_TIMESTAMP")
+    List<Show> findUpcomingShows();
+
+
 }

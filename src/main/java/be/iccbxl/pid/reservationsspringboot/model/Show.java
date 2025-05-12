@@ -5,10 +5,12 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Data
 @Entity
@@ -17,6 +19,10 @@ public class Show {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+    @Column(nullable = false)
+
+    private boolean bookable;
 
     @Column(unique = true)
     private String slug;
@@ -34,7 +40,6 @@ public class Show {
     @JoinColumn(name = "location_id", nullable = true)
     private Location location;
 
-    private boolean bookable;
 
     @ManyToMany
     @JoinTable(name = "show_price",
@@ -233,6 +238,36 @@ public class Show {
                 + ", description=" + description + ", posterUrl=" + posterUrl + ", location="
                 + location + ", bookable=" + bookable + ", prices=" + prices.size()
                 + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + ", representations=" + representations.size() + "]";
+    }
+
+    public String getAuthorsAsString() {
+        if (artistTypes == null || artistTypes.isEmpty()) return "Inconnu";
+
+        return artistTypes.stream()
+                .map(at -> {
+                    Artist artist = at.getArtist();
+                    return artist.getFirstname() + " " + artist.getLastname();
+                })
+                .distinct()
+                .collect(Collectors.joining(", "));
+    }
+    @Transient
+    public String getFullLocation() {
+        if (location == null) return "Lieu inconnu";
+
+        String place = location.getDesignation();
+        String city = location.getLocality() != null ? location.getLocality().getLocality() : "Ville inconnue";
+
+        return place + ", " + city;
+    }
+
+    @Transient
+    public String getNextRepresentationDateFormatted() {
+        return representations.stream()
+                .filter(r -> r.getWhen().isAfter(LocalDateTime.now()))
+                .map(r -> r.getWhen().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")))
+                .findFirst()
+                .orElse("Aucune date");
     }
 
 }
