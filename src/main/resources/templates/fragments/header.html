@@ -32,6 +32,7 @@
 
                     <!-- 🛒 Lien vers le panier -->
                     <a th:href="@{/cart/view}"
+                       sec:authorize="isAuthenticated()"
                        th:classappend="${module == 'cart'} ? 'bg-gray-900 text-white' : ''"
                        class="text-sm px-3 py-2 rounded-md hover:bg-gray-700 text-gray-300 hover:text-white">
                         🛒 Mon panier
