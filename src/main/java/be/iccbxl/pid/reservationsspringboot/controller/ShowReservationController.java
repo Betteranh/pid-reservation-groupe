@@ -47,56 +47,9 @@ public class ShowReservationController {
         List<Representation> reps = repService.getFromShow(show);
         model.addAttribute("representations", reps);
 
-        // On suppose qu’un spectacle peut avoir plusieurs tarifs associés
         model.addAttribute("prices", show.getPrices());
-
         model.addAttribute("form", new ReservationForm());
         return "reservation/form";
-    }
-
-    /**
-     * Traite la soumission du formulaire, crée Reservation + RepresentationReservation(s).
-     */
-    @PostMapping
-    @PreAuthorize("isAuthenticated()")
-    @Transactional
-    public String processForm(
-            @PathVariable Long showId,
-            @RequestParam("representationId") Long representationId,
-            @RequestParam("priceId") Long priceId,
-            @RequestParam("quantity") Integer quantity,
-            Principal principal,
-            Model model
-    ) {
-        // 1) Récupère l’utilisateur
-        User user = userRepo.findByLogin(principal.getName());
-        if (user == null) {
-            model.addAttribute("errorMessage", "Utilisateur non trouvé.");
-            return "error/403";
-        }
-
-        // 2) Crée la réservation
-        Reservation res = new Reservation();
-        res.setUser(user);
-        res.setBookingDate(LocalDateTime.now());
-        res.setStatus("PENDING");
-        reservationService.save(res);
-
-        // 3) Crée et rattache l’item
-        Representation rep = repService.get(representationId.toString());
-        Price price = priceService.getPrice(priceId);
-        RepresentationReservation item = new RepresentationReservation();
-        item.setRepresentation(rep);
-        item.setPrice(price);
-        item.setQuantity(quantity);
-        item.setReservation(res);
-        res.addItem(item);
-
-        // 4) Sauvegarde finale
-        reservationService.save(res);
-
-        return "redirect:/shows/" + showId + "/reserve/confirmation/" + res.getId();
-
     }
 
     /**

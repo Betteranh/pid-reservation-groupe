@@ -3,6 +3,7 @@ package be.iccbxl.pid.reservationsspringboot.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -19,10 +20,12 @@ public class SpringSecurityConfig {
     private CustomUserDetailsService customUserDetailsService;
 
     @Bean
-    public SecurityFilterChain configure(final HttpSecurity http) throws Exception {
-        return http.cors(Customizer.withDefaults())
-                .csrf(Customizer.withDefaults())
+    public SecurityFilterChain configure(HttpSecurity http) throws Exception {
+        return http
+                .cors(Customizer.withDefaults())
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/cart/**")) // ✅ ajoute ça
                 .authorizeHttpRequests(auth -> {
+                    auth.requestMatchers(HttpMethod.POST, "/cart/**").authenticated();
                     auth.requestMatchers("/admin").hasRole("ADMIN");
                     auth.requestMatchers("/user").hasRole("MEMBER");
                     auth.anyRequest().permitAll();
