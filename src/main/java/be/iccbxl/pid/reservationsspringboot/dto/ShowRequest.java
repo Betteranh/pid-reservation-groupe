@@ -10,7 +10,6 @@ import java.util.List;
 public class ShowRequest {
     @NotBlank
     private String title;
-
     private String description;
     private String posterUrl;
 
