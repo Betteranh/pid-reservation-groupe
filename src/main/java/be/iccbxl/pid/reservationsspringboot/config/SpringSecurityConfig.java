@@ -53,6 +53,7 @@ public class SpringSecurityConfig {
                     auth.requestMatchers("/api/auth/check").permitAll();
                     auth.requestMatchers("/api/login").permitAll();  // Ajout de /api/login
                     auth.requestMatchers("/api/logout").permitAll();
+                    auth.requestMatchers( "/api/tags/**" ).hasRole("ADMIN");
                     auth.requestMatchers("/admin").hasRole("ADMIN");
                     auth.requestMatchers("/user").hasRole("MEMBER");
                     auth.anyRequest().permitAll();

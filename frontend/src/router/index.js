@@ -4,10 +4,11 @@ import { createRouter, createWebHistory } from 'vue-router';
 import AppHome from "@/views/AppHome.vue";
 import LoginTest from "@/views/LoginTest.vue";
 
-import LocalitiesList from "@/views/LocalitiesList.vue";
-import LocalityDetails from "@/views/LocalityDetails.vue";
+import LocalitiesList from "@/views/locations/LocalitiesList.vue";
+import LocalityDetails from "@/views/locations/LocalityDetails.vue";
 import Showlist from "@/views/shows/ShowList.vue";
 import ShowDetails from "@/views/shows/ShowDetails.vue";
+import Crud from "@/views/tags/Crud.vue";
 
 
 const routes = [
@@ -42,7 +43,13 @@ const routes = [
     component: LocalityDetails,
     meta: {requiresAuth: true}
   },
+  {
+    path: '/tags',
+    name: 'crud',
+    component: Crud,
+    meta: {requiresAuth: true}
 
+  }
 
 ];
 

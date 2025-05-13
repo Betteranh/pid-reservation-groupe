@@ -9,11 +9,21 @@
             <router-link to="/localities" class="text-gray-300 hover:text-white">Localités</router-link>
             <router-link to="/shows" class="text-gray-300 hover:text-white">Spectacles</router-link>
             <router-link to="/cart/view" class="text-gray-300 hover:text-white">🛒 Mon panier</router-link>
+
+            <!-- ✅ Bouton Tags visible seulement pour les admins -->
+            <router-link
+                v-if="roles && roles.includes('ROLE_ADMIN')"
+                to="/tags"
+                class="text-yellow-300 hover:text-white"
+            >
+              Tags
+            </router-link>
           </nav>
         </div>
+
+        <!-- Authentification -->
         <div class="flex items-center space-x-4">
           <div v-if="!isAuthenticated">
-            <!-- Liens vers le backend -->
             <a href="/login" class="text-gray-300 hover:text-white">Se connecter</a>
             <a href="/registration" class="text-gray-300 hover:text-white ml-2">S'inscrire</a>
           </div>
@@ -26,8 +36,6 @@
         </div>
       </div>
     </div>
-
-
   </header>
 </template>
 
@@ -39,27 +47,24 @@ export default {
     return {
       isAuthenticated: false,
       username: '',
-      // showLoginForm: false,
-      // loginInput: '',
-      // password: '',
-      // errorMessage: ''
+      roles: []
     };
   },
-
-
-
   async mounted() {
     try {
       const response = await api.get('/auth/check');
       this.username = response.data.username;
+      this.roles = Array.isArray(response.data.roles) ? response.data.roles : [];
       this.isAuthenticated = true;
+      console.log('✅ Rôles récupérés :', this.roles);
     } catch {
       this.isAuthenticated = false;
+      this.roles = [];
     }
   }
 };
 </script>
 
 <style scoped>
-/* Ton style est toujours ok */
+/* Tu peux ajouter un fond ou une bordure pour tester visuellement */
 </style>
