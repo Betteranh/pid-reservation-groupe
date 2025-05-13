@@ -77,7 +77,7 @@ public class ReviewController {
         return "redirect:/shows/" + review.getShow().getId(); // ou slug si besoin
     }
 
-    @PostMapping("/reviews/delete")
+    @PostMapping("/delete")
     public String deleteReview(@RequestParam Long reviewId, Principal principal) {
         Review review = reviewService.getReview(reviewId);
         if (review != null && review.getUser().getLogin().equals(principal.getName())) {
