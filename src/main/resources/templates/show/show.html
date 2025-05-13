@@ -88,7 +88,7 @@
                     <span class="text-yellow-600 text-sm font-semibold" th:text="'⭐ ' + ${review.stars} + '/5'">⭐ 4/5</span>
                 </div>
                 <p class="text-gray-700 mb-2" th:text="${review.review}">Contenu du commentaire</p>
-                <small class="text-gray-400" th:text="${#dates.format(review.createdAt, 'dd/MM/yyyy HH:mm')}">Date</small>
+                <small class="text-gray-400" th:text="${#temporals.format(review.createdAt, 'dd/MM/yyyy HH:mm')}">Date</small>
             </div>
 
             <!-- Formulaire de commentaire -->

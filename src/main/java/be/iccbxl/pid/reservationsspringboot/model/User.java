@@ -119,6 +119,7 @@ public class User {
         this.reviews = reviews;
     }
 
+
     @Enumerated(EnumType.STRING)
     private UserRole role;
 

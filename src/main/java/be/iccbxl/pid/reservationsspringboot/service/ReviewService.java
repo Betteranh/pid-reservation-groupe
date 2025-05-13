@@ -34,4 +34,8 @@ public class ReviewService {
     public void deleteReview(Long id) {
         repository.deleteById(id);
     }
+    public List<Review> getReviewsByShowId(Long showId) {
+        return repository.findByShowId(showId);
+    }
+
 }

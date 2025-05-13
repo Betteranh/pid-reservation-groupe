@@ -43,7 +43,7 @@ public class ShowController {
         }
 
         // Charger les commentaires liés au spectacle
-        List<Review> reviews = reviewService.getAllReviews();
+        List<Review> reviews = reviewService.getReviewsByShowId(show.getId());
 
         model.addAttribute("show", show);
         model.addAttribute("collaborateurs", collaborateurs);
