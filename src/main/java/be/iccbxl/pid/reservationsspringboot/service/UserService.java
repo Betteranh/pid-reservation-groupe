@@ -20,7 +20,9 @@ public class UserService {
 
         return users;
     }
-
+    public User findByLogin(String login) {
+        return userRepository.findByLogin(login); // sans Optional
+    }
     public User getUser(long id) {
         return userRepository.findById(id);
     }
