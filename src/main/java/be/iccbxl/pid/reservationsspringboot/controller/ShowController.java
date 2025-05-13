@@ -36,7 +36,7 @@ public class ShowController {
     @Autowired
     TagService tagService;
 
-    @GetMapping("/shows")
+    @GetMapping("/dev/shows")
     public String index(@RequestParam(value = "tag", required = false) String tagLabel, Model model) {
         List<Show> shows;
         String title = "Liste des spectacles";
@@ -62,7 +62,7 @@ public class ShowController {
         return "show/index";
     }
 
-    @GetMapping("/shows/{id}")
+    @GetMapping("/dev/shows/{id}")
     @Transactional
     public String show(Model model, @PathVariable("id") String id) {
         Show show = service.getWithAssociations(id);
