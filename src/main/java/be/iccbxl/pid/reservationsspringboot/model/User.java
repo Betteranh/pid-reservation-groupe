@@ -140,6 +140,10 @@ public class User {
         this.roles.add(role);
         role.getUsers().add(this);
     }
+    public boolean hasRole(UserRole role) {
+        return this.role == role;
+    }
+
 
     public void addRepresentation(Representation representation) {
         this.representations.add(representation);

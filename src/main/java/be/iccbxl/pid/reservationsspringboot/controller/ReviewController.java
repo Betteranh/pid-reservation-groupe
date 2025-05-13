@@ -80,9 +80,20 @@ public class ReviewController {
     @PostMapping("/delete")
     public String deleteReview(@RequestParam Long reviewId, Principal principal) {
         Review review = reviewService.getReview(reviewId);
-        if (review != null && review.getUser().getLogin().equals(principal.getName())) {
-            reviewService.deleteReview(reviewId);
+
+        if (review != null) {
+            String currentUsername = principal.getName();
+            User currentUser = userService.findByLogin(currentUsername);
+
+            boolean isOwner = review.getUser().getLogin().equals(currentUsername);
+            boolean isAdmin = currentUser != null && currentUser.hasRole(UserRole.ADMIN);
+
+            if (isOwner || isAdmin) {
+                reviewService.deleteReview(reviewId);
+            }
         }
-        return "redirect:/shows/" + review.getShow().getId();
+
+        return "redirect:/shows/" + (review != null ? review.getShow().getId() : "");
     }
+
 }

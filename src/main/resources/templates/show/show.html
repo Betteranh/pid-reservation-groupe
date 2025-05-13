@@ -89,8 +89,8 @@
                         <span class="text-yellow-600 text-sm font-semibold ml-2" th:text="'⭐ ' + ${review.stars} + '/5'">⭐ 4/5</span>
                     </div>
 
-                    <!-- Bouton de suppression -->
-                    <form th:if="${#authentication.name == review.user.login}"
+                    <!-- Bouton de suppression visible si auteur OU admin -->
+                    <form th:if="${#authentication.name == review.user.login or #authorization.expression('hasRole(''ADMIN'')')}"
                           th:action="@{/reviews/delete}" method="post"
                           onsubmit="return confirm('Voulez-vous vraiment supprimer ce commentaire ?');">
                         <input type="hidden" name="reviewId" th:value="${review.id}" />
