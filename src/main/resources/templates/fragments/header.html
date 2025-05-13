@@ -36,6 +36,14 @@
                         Infos pratiques
                     </a>
 
+                    <!-- Lien Admin réservé aux utilisateurs avec le rôle ADMIN -->
+                    <a th:href="@{/admin/shows}"
+                       sec:authorize="hasRole('ADMIN')"
+                       th:classappend="${module == 'admin-shows'} ? 'bg-gray-900 text-white' : ''"
+                       class="text-sm px-3 py-2 rounded-md hover:bg-gray-700 text-gray-300 hover:text-white">
+                        Gestion des spectacles
+                    </a>
+
                     <!-- 🛒 Lien vers le panier -->
                     <a th:href="@{/cart/view}"
                        sec:authorize="isAuthenticated()"
