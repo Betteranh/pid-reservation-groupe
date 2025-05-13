@@ -163,7 +163,7 @@ public class ShowController {
         item.setRepresentationId(rep.getId());
         item.setPriceId(price.getId());
         item.setQuantity(quantity);
-        item.setLabel(rep.getWhen().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+        item.setLabel(rep.getScheduledAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
         item.setUnitPrice(price.getPrice());
 
         cart.addItem(item);

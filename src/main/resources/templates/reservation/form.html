@@ -17,7 +17,7 @@
                     class="w-full border rounded px-3 py-2">
                 <option th:each="rep : ${representations}"
                         th:value="${rep.id}"
-                        th:text="${#temporals.format(rep.when,'dd/MM/yyyy HH:mm')}">
+                        th:text="${#temporals.format(rep.scheduledAt,'dd/MM/yyyy HH:mm')}">
                     01/01/2025 20:00
                 </option>
             </select>

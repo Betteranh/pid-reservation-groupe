@@ -73,7 +73,7 @@ public class CartController {
         item.setQuantity(quantity);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-        item.setLabel(representation.getWhen().format(formatter));
+        item.setLabel(representation.getScheduledAt().format(formatter));
 
         item.setUnitPrice(price.getPrice());
 

@@ -30,7 +30,7 @@ public interface ShowRepository extends CrudRepository<Show, Long> {
 
     @Query("SELECT DISTINCT s FROM Show s " +
             "JOIN s.representations r " +
-            "WHERE s.bookable = true AND r.when > CURRENT_TIMESTAMP")
+            "WHERE s.bookable = true AND r.scheduledAt > CURRENT_TIMESTAMP")
     List<Show> findUpcomingShows();
 
 

@@ -113,24 +113,21 @@ public class Location {
         return shows;
     }
 
-    public Location addShow(Show show) {
-        if (!this.shows.contains(show)) {
-            this.shows.add(show);
-            show.setLocation(this);
+    public void addShow(Show show) {
+        if (!shows.contains(show)) {
+            shows.add(show);
+            if (show.getLocation() != this) {
+                show.setLocation(this);
+            }
         }
-
-        return this;
     }
 
-    public Location removeShow(Show show) {
-        if (this.shows.contains(show)) {
-            this.shows.remove(show);
-            if (show.getLocation().equals(this)) {
+    public void removeShow(Show show) {
+        if (shows.remove(show)) {
+            if (show.getLocation() == this) {
                 show.setLocation(null);
             }
         }
-
-        return this;
     }
 
     public List<Representation> getRepresentations() {

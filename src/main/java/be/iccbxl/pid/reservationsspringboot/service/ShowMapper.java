@@ -46,7 +46,7 @@ public class ShowMapper {
         dto.representations = s.getRepresentations().stream().map(rep -> {
             var rd = new RepresentationDto();
             rd.id = rep.getId();
-            rd.when = rep.getWhen();
+            rd.when = rep.getScheduledAt();
             rd.capacity = rep.getEffectiveCapacity();
             rd.availableSeats = rep.getAvailableSeats();
             return rd;

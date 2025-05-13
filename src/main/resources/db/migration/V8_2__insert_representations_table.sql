@@ -1,4 +1,4 @@
-INSERT INTO `representations` (`id`, `show_id`, `location_id`, `when`)
+INSERT INTO `representations` (`id`, `show_id`, `location_id`, `scheduled_at`)
 VALUES (1, 1, 1, '2025-06-05 20:00:00'),
        (2, 1, 1, '2025-06-12 20:00:00'),
        (3, 1, 1, '2025-06-19 20:00:00'),

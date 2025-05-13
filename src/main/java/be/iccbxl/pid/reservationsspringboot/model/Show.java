@@ -3,21 +3,20 @@ package be.iccbxl.pid.reservationsspringboot.model;
 import com.github.slugify.Slugify;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Data
 @Entity
+@EntityListeners(Show.AuditListener.class)
 @Table(name = "shows")
 public class Show {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
@@ -50,16 +49,32 @@ public class Show {
     /**
      * Date de création du spectacle
      */
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     /**
      * Date de modification du spectacle
      */
-    @Column(name = "updated_at")
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @OneToMany(targetEntity = Representation.class, mappedBy = "show")
+    public static class AuditListener {
+        @PrePersist
+        public void setCreatedAndUpdated(Show s) {
+            LocalDateTime now = LocalDateTime.now();
+            s.createdAt = now;
+            s.updatedAt = now;
+        }
+
+        @PreUpdate
+        public void setUpdated(Show s) {
+            s.updatedAt = LocalDateTime.now();
+        }
+    }
+
+    @OneToMany(mappedBy = "show",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
     private List<Representation> representations = new ArrayList<>();
 
     @ManyToMany(mappedBy = "shows")
@@ -138,17 +153,27 @@ public class Show {
         return location;
     }
 
-    public void setLocation(Location location) {
-        this.location.removeShow(this);    //déménager de l’ancien lieu
-        this.location = location;
-        this.location.addShow(this);        //emménager dans le nouveau lieu
+    public void setLocation(Location newLocation) {
+        if (Objects.equals(this.location, newLocation)) {
+            return; // déjà à jour, on sort
+        }
+        Location old = this.location;
+        this.location = newLocation;
+        // Retirer de l’ancienne
+        if (old != null && old.getShows().contains(this)) {
+            old.getShows().remove(this);
+        }
+        // Ajouter à la nouvelle
+        if (newLocation != null && !newLocation.getShows().contains(this)) {
+            newLocation.getShows().add(this);
+        }
     }
 
     /**
      * Un spectacle est réservable si **au moins une** représentation a des places dispo
      */
     @Transient
-    public boolean isBookable() {
+    public boolean hasAvailableSeats() {
         return representations.stream().anyMatch(r -> r.getAvailableSeats() > 0);
     }
 
@@ -217,7 +242,7 @@ public class Show {
     public Show addArtistType(ArtistType artistType) {
         if (!this.artistTypes.contains(artistType)) {
             this.artistTypes.add(artistType);
-            artistType.addShow(this);
+            //artistType.addShow(this);
         }
 
         return this;
@@ -251,6 +276,7 @@ public class Show {
                 .distinct()
                 .collect(Collectors.joining(", "));
     }
+
     @Transient
     public String getFullLocation() {
         if (location == null) return "Lieu inconnu";
@@ -264,8 +290,8 @@ public class Show {
     @Transient
     public String getNextRepresentationDateFormatted() {
         return representations.stream()
-                .filter(r -> r.getWhen().isAfter(LocalDateTime.now()))
-                .map(r -> r.getWhen().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")))
+                .filter(r -> r.getScheduledAt().isAfter(LocalDateTime.now()))
+                .map(r -> r.getScheduledAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")))
                 .findFirst()
                 .orElse("Aucune date");
     }
