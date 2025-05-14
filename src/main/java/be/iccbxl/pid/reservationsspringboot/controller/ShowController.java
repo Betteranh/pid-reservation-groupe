@@ -1,6 +1,7 @@
 package be.iccbxl.pid.reservationsspringboot.controller;
 
 import be.iccbxl.pid.reservationsspringboot.model.*;
+import be.iccbxl.pid.reservationsspringboot.service.ReviewService;
 import be.iccbxl.pid.reservationsspringboot.service.ShowService;
 import be.iccbxl.pid.reservationsspringboot.service.TagService;
 import jakarta.transaction.Transactional;
@@ -11,13 +12,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import be.iccbxl.pid.reservationsspringboot.model.Representation;
 import be.iccbxl.pid.reservationsspringboot.repository.RepresentationRepository;
 
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-
-
 
 @Controller
 @SessionAttributes("cart")
@@ -35,6 +33,9 @@ public class ShowController {
 
     @Autowired
     TagService tagService;
+
+    @Autowired
+    private ReviewService reviewService; // 🔧 Ajouté pour les commentaires
 
     @GetMapping("/dev/shows")
     public String index(@RequestParam(value = "tag", required = false) String tagLabel, Model model) {
@@ -94,6 +95,9 @@ public class ShowController {
         model.addAttribute("availableTags", tagService.findAll());
         model.addAttribute("show", show);
         model.addAttribute("title", "Fiche d'un spectacle");
+
+        // 🔧 Ajouter les reviews au modèle sans toucher le reste du contrôleur
+        model.addAttribute("reviews", reviewService.getReviewsByShowId(show.getId()));
 
         return "show/show";
     }
@@ -163,7 +167,7 @@ public class ShowController {
         item.setRepresentationId(rep.getId());
         item.setPriceId(price.getId());
         item.setQuantity(quantity);
-        item.setLabel(rep.getWhen().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+        item.setLabel(rep.getScheduledAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
         item.setUnitPrice(price.getPrice());
 
         cart.addItem(item);

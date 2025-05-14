@@ -33,7 +33,7 @@
         <tbody>
         <tr th:each="item : ${reservation.items}">
             <td class="border px-4 py-2"
-                th:text="${#temporals.format(item.representation.when, 'dd/MM/yyyy HH:mm')}">12/05/2025 20:30
+                th:text="${#temporals.format(item.representation.scheduledAt, 'dd/MM/yyyy HH:mm')}">12/05/2025 20:30
             </td>
             <td class="border px-4 py-2" th:text="${item.price.price + ' €'}">15.00 €</td>
             <td class="border px-4 py-2" th:text="${item.quantity}">2</td>

@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/tags")
 @CrossOrigin(origins = "*")
-@PreAuthorize( "hasRole('ADMIN')" )
+
 public class TagApiController {
 
 
@@ -35,6 +35,7 @@ public class TagApiController {
         return tagMapper.toDTOList( tagService.findAll() );
     }
 
+    @PreAuthorize( "hasRole('ADMIN')" )
     @GetMapping("{id}")
     public ResponseEntity<TagDTO> getTag(@PathVariable Long id) {
         Optional<Tag> tag = tagService.find( id );
@@ -42,6 +43,7 @@ public class TagApiController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize( "hasRole('ADMIN')" )
     @PostMapping
     public ResponseEntity<TagDTO> createTag(@RequestBody TagDTO tagDTO) {
         Tag tag = new Tag();
@@ -50,6 +52,7 @@ public class TagApiController {
         return ResponseEntity.ok( tagMapper.toDTO( tag ) );
     }
 
+    @PreAuthorize( "hasRole('ADMIN')" )
     //update
     @PutMapping("/{id}")
     public ResponseEntity<TagDTO> updateTag(@PathVariable Long id, @RequestBody TagDTO tagDTO) {
@@ -62,6 +65,8 @@ public class TagApiController {
         tagService.save( tag );
         return ResponseEntity.ok( tagMapper.toDTO( tag ) );
     }
+
+    @PreAuthorize( "hasRole('ADMIN')" )
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTag(@PathVariable Long id) {
         Optional<Tag> tag = tagService.find(id);

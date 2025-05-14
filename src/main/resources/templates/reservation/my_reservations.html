@@ -23,7 +23,7 @@
                 <h3 class="font-semibold text-gray-700 mb-2">Détails :</h3>
                 <ul class="list-disc list-inside space-y-1">
                     <li th:each="item : ${reservation.items}">
-                        🎭 <span th:text="${#temporals.format(item.representation.when, 'dd/MM/yyyy HH:mm')}">Date</span> -
+                        🎭 <span th:text="${#temporals.format(item.representation.scheduledAt, 'dd/MM/yyyy HH:mm')}">Date</span> -
                         <span th:text="${item.price.price + '€'}">Prix</span> x
                         <span th:text="${item.quantity}">Quantité</span>
                     </li>

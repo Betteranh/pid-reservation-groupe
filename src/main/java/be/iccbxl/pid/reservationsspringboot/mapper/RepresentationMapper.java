@@ -15,7 +15,7 @@ public class RepresentationMapper {
         return new RepresentationDTO(
                 representation.getId(),
                 representation.getShow().getTitle(),
-                representation.getWhen(),
+                representation.getScheduledAt(),
                 representation.getLocation() != null ? representation.getLocation().getDesignation() : null,
                 representation.getAvailableSeats()
         );

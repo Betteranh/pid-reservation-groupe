@@ -3,6 +3,7 @@ package be.iccbxl.pid.reservationsspringboot.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -53,7 +54,14 @@ public class SpringSecurityConfig {
                     auth.requestMatchers("/api/auth/check").permitAll();
                     auth.requestMatchers("/api/login").permitAll();  // Ajout de /api/login
                     auth.requestMatchers("/api/logout").permitAll();
+
+                    auth.requestMatchers( "/api/tags" ).permitAll();
                     auth.requestMatchers( "/api/tags/**" ).hasRole("ADMIN");
+
+                    auth.requestMatchers( "/cart/view" ).permitAll();
+                    auth.requestMatchers( "/cart/delete" ).permitAll();
+                    auth.requestMatchers( HttpMethod.POST, "/cart/checkout" ).authenticated();
+
                     auth.requestMatchers("/admin").hasRole("ADMIN");
                     auth.requestMatchers("/user").hasRole("MEMBER");
                     auth.anyRequest().permitAll();

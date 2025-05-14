@@ -5,9 +5,9 @@ import be.iccbxl.pid.reservationsspringboot.repository.PriceRepository;
 import be.iccbxl.pid.reservationsspringboot.repository.RepresentationRepository;
 import be.iccbxl.pid.reservationsspringboot.repository.UserRepository;
 import be.iccbxl.pid.reservationsspringboot.service.ReservationService;
-import be.iccbxl.pid.reservationsspringboot.service.StripeService; // ✅ IMPORT pour Stripe
-import com.stripe.model.checkout.Session; // ✅ IMPORT pour Stripe Session
-import com.stripe.param.checkout.SessionCreateParams; // ✅ IMPORT pour Stripe Session Params
+import be.iccbxl.pid.reservationsspringboot.service.StripeService;
+import com.stripe.model.checkout.Session;
+import com.stripe.param.checkout.SessionCreateParams;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -73,7 +73,7 @@ public class CartController {
         item.setQuantity(quantity);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-        item.setLabel(representation.getWhen().format(formatter));
+        item.setLabel(representation.getScheduledAt().format(formatter));
 
         item.setUnitPrice(price.getPrice());
 
@@ -105,7 +105,7 @@ public class CartController {
             return "redirect:/login";
         }
 
-        // ✅ 1. Créer une réservation "PENDING" et l'enregistrer en base
+        //  Créer une réservation "PENDING" et l'enregistrer en base
         Reservation reservation = new Reservation();
         reservation.setUser(user);
         reservation.setBookingDate(LocalDateTime.now());
@@ -127,7 +127,7 @@ public class CartController {
         reservationService.save(reservation); // Enregistrer en BDD directement
         session.setAttribute("lastReservationId", reservation.getId()); // Stocker ID dans la session
 
-        // ✅ 2. Créer la session Stripe avec les items
+        // Créer la session Stripe avec les items
         List<SessionCreateParams.LineItem> lineItems = new ArrayList<>();
 
         for (CartItem item : cart.getItems()) {

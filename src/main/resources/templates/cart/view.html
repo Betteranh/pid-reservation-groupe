@@ -30,6 +30,7 @@
                 <td class="px-4 py-2" th:text="${item.unitPrice * item.quantity + ' €'}">30 €</td>
                 <td class="px-4 py-2">
                     <form method="post" th:action="@{'/cart/delete/' + ${iStat.index}}">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                         <button type="submit" class="text-red-600 hover:underline">Supprimer</button>
                     </form>
                 </td>
@@ -45,6 +46,7 @@
         </table>
 
         <form method="post" action="/cart/checkout">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">
                 ✅ Valider et payer
             </button>

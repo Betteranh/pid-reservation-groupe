@@ -5,6 +5,7 @@ import be.iccbxl.pid.reservationsspringboot.dto.ArtistTypeDTO;
 import be.iccbxl.pid.reservationsspringboot.mapper.ArtistMapper;
 import be.iccbxl.pid.reservationsspringboot.model.Artist;
 import be.iccbxl.pid.reservationsspringboot.service.ArtistService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "*")
+
 public class ArtistApiController {
 
     @Autowired
@@ -40,7 +41,7 @@ public class ArtistApiController {
     }
 
     @PostMapping ("/artists")
-    public ResponseEntity<ArtistDTO> create(@RequestBody ArtistDTO artistDTO) {
+    public ResponseEntity<ArtistDTO> create(@Valid @RequestBody ArtistDTO artistDTO) {
         Artist a = artistMapper.toEntity(artistDTO);
         artistService.addArtist(a);
         return ResponseEntity.ok(artistMapper.toDTO(a));
@@ -48,7 +49,7 @@ public class ArtistApiController {
     }
 
     @PutMapping("/artists/{id}")
-    public ResponseEntity<ArtistDTO> update(@PathVariable Long id, @RequestBody ArtistDTO artistDTO ) {
+    public ResponseEntity<ArtistDTO> update(@Valid @PathVariable Long id, @RequestBody ArtistDTO artistDTO ) {
         Artist existing = artistService.getArtist(id);
         if (existing == null) return ResponseEntity.notFound().build();
 

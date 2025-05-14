@@ -9,6 +9,8 @@ import LocalityDetails from "@/views/locations/LocalityDetails.vue";
 import Showlist from "@/views/shows/ShowList.vue";
 import ShowDetails from "@/views/shows/ShowDetails.vue";
 import Crud from "@/views/tags/Crud.vue";
+import InfosPratiques from "@/views/info/InfosPratiques.vue";
+
 
 
 const routes = [
@@ -48,8 +50,15 @@ const routes = [
     name: 'crud',
     component: Crud,
     meta: {requiresAuth: true}
+  },
+  {
+    path: '/infos',
+    name: 'InfosPratiques',
+    component: InfosPratiques
 
   }
+
+
 
 ];
 
