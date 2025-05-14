@@ -7,6 +7,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -32,22 +33,41 @@ public class User {
     @JsonIgnore
     private List<Role> roles = new ArrayList<>();
 
-    @ManyToMany(mappedBy = "users")
-    @JsonIgnore
-    private List<Representation> representations = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
+
+    /**
+     * Toutes les réservations passées par cet utilisateur.
+     */
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Reservation> reservations = new ArrayList<>();
+
+    /**
+     * Retourne la liste des spectacles (Representation) réservés par cet utilisateur,
+     * en parcourant toutes ses Reservation → RepresentationReservation.
+     */
+    @Transient
+    public List<Representation> getRepresentations() {
+        return reservations.stream()
+                .flatMap(res -> res.getItems().stream())
+                .map(item -> item.getRepresentation())
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    // Méthode utilitaire pour lier une nouvelle réservation
+    public void addReservation(Reservation reservation) {
+        this.reservations.add(reservation);
+        reservation.setUser(this);
+    }
 
     public void addRole(Role role) {
         this.roles.add(role);
         role.getUsers().add(this);
     }
 
-    public void addRepresentation(Representation representation) {
-        this.representations.add(representation);
-        representation.getUsers().add(this);
-    }
 
     @Override
     public String toString() {

@@ -5,10 +5,12 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "representations")
 public class Representation {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -36,6 +38,23 @@ public class Representation {
     @Column(nullable = false)
     private Integer capacity;
 
+    /**
+     * Réservations de cette représentation, avec quantité et prix
+     */
+    @OneToMany(mappedBy = "representation", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<RepresentationReservation> items = new ArrayList<>();
+
+    public Representation() {
+    }
+
+    public Representation(Show show, LocalDateTime scheduledAt, Location location, Integer capacity, List<RepresentationReservation> items) {
+        this.show = show;
+        this.scheduledAt = scheduledAt;
+        this.location = location;
+        this.capacity = capacity;
+        this.items = items;
+    }
+
     public List<RepresentationReservation> getItems() {
         return items;
     }
@@ -44,8 +63,6 @@ public class Representation {
         this.items = items;
     }
 
-    @OneToMany(mappedBy = "representation", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<RepresentationReservation> items = new ArrayList<>();
 
     public Integer getCapacity() {
         return capacity;
@@ -53,22 +70,6 @@ public class Representation {
 
     public void setCapacity(Integer capacity) {
         this.capacity = capacity;
-    }
-
-    @ManyToMany
-    @JoinTable(
-            name = "reservations",
-            joinColumns = @JoinColumn(name = "representation_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private List<User> users = new ArrayList<>();
-
-    public Representation() {
-    }
-
-    public Representation(Show show, LocalDateTime scheduledAt, Location location) {
-        this.show = show;
-        this.scheduledAt = scheduledAt;
-        this.location = location;
     }
 
     public Show getShow() {
@@ -99,26 +100,16 @@ public class Representation {
         return id;
     }
 
+    /**
+     * Retourne la liste des utilisateurs ayant réservé
+     */
+    @Transient
     public List<User> getUsers() {
-        return users;
-    }
-
-    public Representation addUser(User user) {
-        if (!this.users.contains(user)) {
-            this.users.add(user);
-            user.addRepresentation(this);
-        }
-
-        return this;
-    }
-
-    public Representation removeUser(User user) {
-        if (this.users.contains(user)) {
-            this.users.remove(user);
-            user.getRepresentations().remove(this);
-        }
-
-        return this;
+        return items.stream()
+                .map(RepresentationReservation::getReservation)
+                .map(Reservation::getUser)
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     /**
@@ -150,8 +141,12 @@ public class Representation {
 
     @Override
     public String toString() {
-        return "Representation [id=" + id + ", show=" + show + ", scheduledAt=" + scheduledAt
-                + ", location=" + location + "]";
+        return "Representation{" +
+                "id=" + id +
+                ", show=" + show +
+                ", scheduledAt=" + scheduledAt +
+                ", location=" + location +
+                '}';
     }
 
 }
