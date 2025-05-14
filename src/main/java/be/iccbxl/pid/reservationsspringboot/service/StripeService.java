@@ -18,8 +18,8 @@ public class StripeService {
     public Session createCheckoutSession(List<SessionCreateParams.LineItem> items) throws Exception {
         SessionCreateParams params = SessionCreateParams.builder()
                 .setMode(SessionCreateParams.Mode.PAYMENT)
-                .setSuccessUrl("http://localhost:8080/payment/success") // 🔵 redirection après paiement OK
-                .setCancelUrl("http://localhost:8080/cart/view")                 // 🔴 redirection si annulation
+                .setSuccessUrl("https://pid-reservation-groupe.onrender.com/payment/success") // 🔵 redirection après paiement OK
+                .setCancelUrl("https://pid-reservation-groupe.onrender.com/cart/view")                 // 🔴 redirection si annulation
                 .addAllLineItem(items)
                 .build();
 
