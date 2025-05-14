@@ -5,8 +5,9 @@ CREATE TABLE `locations`
     `designation` varchar(60) COLLATE utf8mb4_unicode_ci  NOT NULL,
     `address`     varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
     `locality_id` int(11)                                 NOT NULL,
-    `website`     varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `phone`       varchar(30) COLLATE utf8mb4_unicode_ci  DEFAULT NULL,
+    `website`     varchar(255) COLLATE utf8mb4_unicode_ci          DEFAULT NULL,
+    `phone`       varchar(30) COLLATE utf8mb4_unicode_ci           DEFAULT NULL,
+    `capacity`    int(11)                                 NOT NULL DEFAULT 100,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4

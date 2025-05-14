@@ -2,8 +2,9 @@ CREATE TABLE `representations`
 (
     `id`          int(11)     NOT NULL AUTO_INCREMENT,
     `show_id`     int(11)     NOT NULL,
-    `location_id` int(11) DEFAULT NULL,
-    `when`        datetime(6) NOT NULL,
+    `location_id` int(11)              DEFAULT NULL,
+    `scheduled_at`        datetime(6) NOT NULL,
+    `capacity`    int(11)     NOT NULL DEFAULT 100,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4

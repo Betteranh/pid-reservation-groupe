@@ -13,6 +13,6 @@ public interface RepresentationRepository extends CrudRepository<Representation,
 
     List<Representation> findByLocation(Location location);
 
-    List<Representation> findByWhen(LocalDateTime when);
+    List<Representation> findByScheduledAt(LocalDateTime scheduledAt);
 
 }

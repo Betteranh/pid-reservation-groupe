@@ -10,7 +10,7 @@ import java.util.List;
 @Table(name = "locations")
 public class Location {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true)
@@ -32,6 +32,8 @@ public class Location {
     @OneToMany(targetEntity = Representation.class, mappedBy = "location")
     private List<Representation> representations = new ArrayList<>();
 
+    @Column(nullable = false)
+    private Integer capacity = 0;
 
     protected Location() {
     }
@@ -46,6 +48,7 @@ public class Location {
         this.phone = phone;
         this.shows = shows;
         this.representations = representations;
+        this.capacity = 0;
     }
 
     public Long getId() {
@@ -152,6 +155,14 @@ public class Location {
         }
 
         return this;
+    }
+
+    public Integer getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(Integer capacity) {
+        this.capacity = capacity;
     }
 
     @Override

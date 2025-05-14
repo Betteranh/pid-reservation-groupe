@@ -10,24 +10,35 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
 
-            <!-- Logo -->
-            <div class="flex items-center space-x-8">
+            <!-- Logo + Navigation -->
+            <div class="flex items-center">
                 <a th:href="@{/}" class="text-white font-bold text-xl hover:text-blue-300 transition">
                     Réservation
                 </a>
 
-                <!-- Navigation principale -->
-                <nav class="hidden md:flex space-x-4">
-                    <a th:href="@{/}"
-                       th:classappend="${module == 'home'} ? 'bg-gray-900 text-white' : ''"
-                       class="text-sm px-3 py-2 rounded-md hover:bg-gray-700 text-gray-300 hover:text-white">
-                        Accueil
-                    </a>
-
+                <nav class="ml-8 space-x-4 flex items-center">
                     <a th:href="@{/shows}"
-                       th:classappend="${module == 'shows'} ? 'bg-gray-900 text-white' : ''"
                        class="text-sm px-3 py-2 rounded-md hover:bg-gray-700 text-gray-300 hover:text-white">
                         Spectacles
+                    </a>
+                    <a th:href="@{/infos-pratiques}"
+                       class="text-sm px-3 py-2 rounded-md hover:bg-gray-700 text-gray-300 hover:text-white">
+                        Infos pratiques
+                    </a>
+
+                    <a th:href="@{/cart/view}" sec:authorize="isAuthenticated()"
+                       class="text-sm px-3 py-2 rounded-md hover:bg-gray-700 text-gray-300 hover:text-white">
+                        🛒 Mon panier
+                    </a>
+
+                    <a th:href="@{/my-reservations}" sec:authorize="isAuthenticated()"
+                       class="text-sm px-3 py-2 rounded-md hover:bg-gray-700 text-gray-300 hover:text-white">
+                        📄 Mes réservations
+                    </a>
+
+                    <a th:href="@{/admin/shows}" sec:authorize="hasRole('ADMIN')"
+                       class="text-sm px-3 py-2 rounded-md hover:bg-gray-700 text-yellow-300 hover:text-white">
+                        Gestion des spectacles
                     </a>
                 </nav>
             </div>

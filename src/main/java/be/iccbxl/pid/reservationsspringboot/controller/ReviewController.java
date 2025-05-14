@@ -1,40 +1,97 @@
 package be.iccbxl.pid.reservationsspringboot.controller;
 
-import be.iccbxl.pid.reservationsspringboot.model.Review;
+import be.iccbxl.pid.reservationsspringboot.model.*;
 import be.iccbxl.pid.reservationsspringboot.service.ReviewService;
+import be.iccbxl.pid.reservationsspringboot.service.ShowService;
+import be.iccbxl.pid.reservationsspringboot.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.security.Principal;
+import java.time.LocalDateTime;
 
-@RestController
+@Controller
 @RequestMapping("/reviews")
 public class ReviewController {
+
     @Autowired
-    private ReviewService service;
+    private ReviewService reviewService;
 
-    @GetMapping
-    public List<Review> getAllReviews() {
-        return service.getAllReviews();
+    @Autowired
+    private ShowService showService;
+
+    @Autowired
+    private UserService userService;
+
+    @PostMapping("/submit")
+    public String submitReview(@RequestParam Long showId,
+                               @RequestParam String review,
+                               @RequestParam int stars,
+                               @AuthenticationPrincipal UserDetails currentUser) {
+
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+
+        User user = userService.findByLogin(currentUser.getUsername());
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        Show show = showService.get(showId.toString());
+        if (show == null) {
+            return "redirect:/dev/shows";
+        }
+
+        Review r = new Review();
+        r.setUser(user);
+        r.setShow(show);
+        r.setReview(review);
+        r.setStars(stars);
+        r.setCreatedAt(LocalDateTime.now());
+        r.setUpdatedAt(LocalDateTime.now());
+
+        reviewService.addReview(r);
+
+        return "redirect:/dev/shows/" + showId;
     }
 
-    @GetMapping("/{id}")
-    public Review getReview(@PathVariable Long id) {
-        return service.getReview(id);
+    @PostMapping("/update")
+    public String updateReview(@RequestParam("reviewId") Long id,
+                               @RequestParam("review") String reviewText,
+                               @RequestParam("stars") int stars,
+                               Principal principal) {
+
+        Review review = reviewService.getReview(id);
+        if (review != null && review.getUser().getLogin().equals(principal.getName())) {
+            review.setReview(reviewText);
+            review.setStars(stars);
+            review.setUpdatedAt(LocalDateTime.now());
+            reviewService.addReview(review);
+        }
+
+        return "redirect:/dev/shows/" + review.getShow().getId();
     }
 
-    @PostMapping
-    public void addReview(@RequestBody Review review) {
-        service.addReview(review);
-    }
+    @PostMapping("/delete")
+    public String deleteReview(@RequestParam Long reviewId, Principal principal) {
+        Review review = reviewService.getReview(reviewId);
 
-    @PutMapping("/{id}")
-    public void updateReview(@PathVariable Long id, @RequestBody Review review) {
-        service.updateReview(id, review);
-    }
+        if (review != null) {
+            String currentUsername = principal.getName();
+            User currentUser = userService.findByLogin(currentUsername);
 
-    @DeleteMapping("/{id}")
-    public void deleteReview(@PathVariable Long id) {
-        service.deleteReview(id);
+            boolean isOwner = review.getUser().getLogin().equals(currentUsername);
+            boolean isAdmin = currentUser != null && currentUser.hasRole(UserRole.ADMIN);
+
+            if (isOwner || isAdmin) {
+                reviewService.deleteReview(reviewId);
+            }
+        }
+
+        return "redirect:/dev/shows/" + (review != null ? review.getShow().getId() : "");
     }
 }

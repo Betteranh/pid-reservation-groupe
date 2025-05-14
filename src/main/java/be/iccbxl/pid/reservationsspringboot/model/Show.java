@@ -3,18 +3,24 @@ package be.iccbxl.pid.reservationsspringboot.model;
 import com.github.slugify.Slugify;
 import jakarta.persistence.*;
 import lombok.Data;
-
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Data
 @Entity
+@EntityListeners(Show.AuditListener.class)
 @Table(name = "shows")
 public class Show {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
+
+    private boolean bookable;
 
     @Column(unique = true)
     private String slug;
@@ -32,7 +38,6 @@ public class Show {
     @JoinColumn(name = "location_id", nullable = true)
     private Location location;
 
-    private boolean bookable;
 
     @ManyToMany
     @JoinTable(name = "show_price",
@@ -43,16 +48,32 @@ public class Show {
     /**
      * Date de création du spectacle
      */
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     /**
      * Date de modification du spectacle
      */
-    @Column(name = "updated_at")
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @OneToMany(targetEntity = Representation.class, mappedBy = "show")
+    public static class AuditListener {
+        @PrePersist
+        public void setCreatedAndUpdated(Show s) {
+            LocalDateTime now = LocalDateTime.now();
+            s.createdAt = now;
+            s.updatedAt = now;
+        }
+
+        @PreUpdate
+        public void setUpdated(Show s) {
+            s.updatedAt = LocalDateTime.now();
+        }
+    }
+
+    @OneToMany(mappedBy = "show",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
     private List<Representation> representations = new ArrayList<>();
 
     @ManyToMany(mappedBy = "shows")
@@ -61,6 +82,13 @@ public class Show {
     @OneToMany(mappedBy = "show", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
 
+    @ManyToMany
+    @JoinTable(
+            name = "show_tag",
+            joinColumns = @JoinColumn(name = "show_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private Set<Tag> tags = new HashSet<>();
 
     public Show() {
     }
@@ -124,14 +152,28 @@ public class Show {
         return location;
     }
 
-    public void setLocation(Location location) {
-        this.location.removeShow(this);    //déménager de l’ancien lieu
-        this.location = location;
-        this.location.addShow(this);        //emménager dans le nouveau lieu
+    public void setLocation(Location newLocation) {
+        if (Objects.equals(this.location, newLocation)) {
+            return; // déjà à jour, on sort
+        }
+        Location old = this.location;
+        this.location = newLocation;
+        // Retirer de l’ancienne
+        if (old != null && old.getShows().contains(this)) {
+            old.getShows().remove(this);
+        }
+        // Ajouter à la nouvelle
+        if (newLocation != null && !newLocation.getShows().contains(this)) {
+            newLocation.getShows().add(this);
+        }
     }
 
-    public boolean isBookable() {
-        return bookable;
+    /**
+     * Un spectacle est réservable si **au moins une** représentation a des places dispo
+     */
+    @Transient
+    public boolean hasAvailableSeats() {
+        return representations.stream().anyMatch(r -> r.getAvailableSeats() > 0);
     }
 
     public void setBookable(boolean bookable) {
@@ -182,6 +224,13 @@ public class Show {
         return this;
     }
 
+    public Set<Tag> getTags() {
+        if (this.tags == null) {
+            this.tags = new HashSet<>();
+        }
+        return tags;
+    }
+
     /**
      * Get the performances (artists in a type of collaboration) for the show
      */
@@ -192,7 +241,7 @@ public class Show {
     public Show addArtistType(ArtistType artistType) {
         if (!this.artistTypes.contains(artistType)) {
             this.artistTypes.add(artistType);
-            artistType.addShow(this);
+            //artistType.addShow(this);
         }
 
         return this;
@@ -213,6 +262,37 @@ public class Show {
                 + ", description=" + description + ", posterUrl=" + posterUrl + ", location="
                 + location + ", bookable=" + bookable + ", prices=" + prices.size()
                 + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + ", representations=" + representations.size() + "]";
+    }
+
+    public String getAuthorsAsString() {
+        if (artistTypes == null || artistTypes.isEmpty()) return "Inconnu";
+
+        return artistTypes.stream()
+                .map(at -> {
+                    Artist artist = at.getArtist();
+                    return artist.getFirstname() + " " + artist.getLastname();
+                })
+                .distinct()
+                .collect(Collectors.joining(", "));
+    }
+
+    @Transient
+    public String getFullLocation() {
+        if (location == null) return "Lieu inconnu";
+
+        String place = location.getDesignation();
+        String city = location.getLocality() != null ? location.getLocality().getLocality() : "Ville inconnue";
+
+        return place + ", " + city;
+    }
+
+    @Transient
+    public String getNextRepresentationDateFormatted() {
+        return representations.stream()
+                .filter(r -> r.getScheduledAt().isAfter(LocalDateTime.now()))
+                .map(r -> r.getScheduledAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")))
+                .findFirst()
+                .orElse("Aucune date");
     }
 
 }
