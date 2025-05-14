@@ -1,7 +1,7 @@
 CREATE TABLE show_tag
 (
     show_id INT(11) NOT NULL,
-    tag_id  INT(11) NOT NULL,
+    tag_id  BIGINT  NOT NULL,
     PRIMARY KEY (show_id, tag_id),
     CONSTRAINT fk_show FOREIGN KEY (show_id)
         REFERENCES shows (id)
