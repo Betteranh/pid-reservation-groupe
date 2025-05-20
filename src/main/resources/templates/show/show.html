@@ -54,7 +54,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // 1) On extrait l’ID depuis l’URL /shows/{id}
-            const parts  = window.location.pathname.split('/');
+            const parts = window.location.pathname.split('/');
             const showId = parts[parts.length - 1];
             const apiUrl = `/api/v1/shows/${showId}`;
 
