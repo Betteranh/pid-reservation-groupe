@@ -3,6 +3,7 @@ package be.iccbxl.pid.reservationsspringboot.controller;
 import be.iccbxl.pid.reservationsspringboot.model.*;
 import be.iccbxl.pid.reservationsspringboot.service.ShowService;
 import be.iccbxl.pid.reservationsspringboot.service.TagService;
+import be.iccbxl.pid.reservationsspringboot.service.VideoService;
 import jakarta.transaction.Transactional;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +19,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 
-
 @Controller
 @SessionAttributes("cart")
 public class ShowController {
+    @Autowired
+    private VideoService videoService;
+
     @ModelAttribute("cart")
     public Cart cart() {
         return new Cart();
@@ -89,9 +92,12 @@ public class ShowController {
         boolean canBook = show.getRepresentations().stream()
                 .anyMatch(r -> r.getAvailableSeats() > 0);
 
+        Hibernate.initialize(show.getVideos());
+
         model.addAttribute("canBook", canBook);
         model.addAttribute("collaborateurs", collaborateurs);
         model.addAttribute("availableTags", tagService.findAll());
+        model.addAttribute("videos", show.getVideos());
         model.addAttribute("show", show);
         model.addAttribute("title", "Fiche d'un spectacle");
 
@@ -168,5 +174,30 @@ public class ShowController {
 
         cart.addItem(item);
         return "redirect:/cart/view";
+    }
+
+    @PostMapping("/shows/{id}/videos")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
+    public String addVideoToShow(@PathVariable("id") String id,
+                                 @RequestParam("title") String title,
+                                 @RequestParam("videoUrl") String videoUrl,
+                                 @RequestParam("artistName") String artistName,
+                                 RedirectAttributes redirectAttributes) {
+        Show show = service.getWithAssociations(id);
+
+        if (show != null) {
+            Video video = new Video();
+            video.setTitle(title);
+            video.setVideoUrl(videoUrl);
+            video.setArtistName(artistName);
+            video.setShow(show);
+            videoService.save(video);
+            redirectAttributes.addFlashAttribute("successMessage", "Vidéo ajoutée !");
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Spectacle introuvable.");
+        }
+
+        return "redirect:/shows/" + id;
     }
 }

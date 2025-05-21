@@ -71,6 +71,9 @@ public class Show {
     )
     private Set<Tag> tags = new HashSet<>();
 
+    @OneToMany(mappedBy = "show", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Video> videos = new ArrayList<>();
+
     public Show() {
     }
 

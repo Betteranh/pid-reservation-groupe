@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+<head>
+    <meta charset="UTF-8">
+    <th:block layout:fragment="title">Vidéos de [[${artistName}]]</th:block>
+</head>
+<body>
+<div layout:fragment="content" class="max-w-4xl mx-auto px-6 py-12">
+    <h1 class="text-3xl font-bold mb-6" th:text="'Vidéos de ' + ${artistName}">Vidéos de l'artiste</h1>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div th:each="video : ${videos}">
+            <h2 class="text-xl font-semibold mb-2" th:text="${video.title}">Titre</h2>
+            <iframe th:src="${video.embedUrl}"
+                    frameborder="0"
+                    allowfullscreen
+                    class="w-full aspect-video rounded-lg shadow mb-6"></iframe>
+        </div>
+    </div>
+    <p th:if="${videos == null or #lists.isEmpty(videos)}"
+       class="italic text-gray-500">
+        Aucune vidéo pour cet artiste.
+    </p>
+    <div class="mt-8">
+        <a th:href="@{/shows}" class="text-blue-600 hover:underline">← Retour aux spectacles</a>
+    </div>
+</div>
+</body>
+</html>
