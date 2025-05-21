@@ -59,7 +59,7 @@ liste des spectacles, lire leur fiche détaillée, réserver des places et laiss
 7. **Se connecter en Admin**
    Login : bob & Password : 12345678
 8. **Consulter**
-   Localhost:8080/artists
+   Localhost:8080/artistszip
 
 
 
