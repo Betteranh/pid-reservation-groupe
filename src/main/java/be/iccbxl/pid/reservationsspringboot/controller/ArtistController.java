@@ -1,10 +1,13 @@
 package be.iccbxl.pid.reservationsspringboot.controller;
 
 import be.iccbxl.pid.reservationsspringboot.model.Artist;
+import be.iccbxl.pid.reservationsspringboot.model.Troupe;
 import be.iccbxl.pid.reservationsspringboot.service.ArtistService;
+import be.iccbxl.pid.reservationsspringboot.service.TroupeService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,11 +21,17 @@ public class ArtistController {
     @Autowired
     ArtistService service;
 
+    @Autowired
+    private TroupeService troupeService;
+
     @GetMapping("/artists")
     public String index(Model model) {
         List<Artist> artists = service.getAllArtists();
+        List<Troupe> troupes = troupeService.findAll();
+
 
         model.addAttribute("artists", artists);
+        model.addAttribute("troupes", troupes);
         model.addAttribute("title", "Liste des artistes");
 
         return "artist/index";
@@ -34,6 +43,7 @@ public class ArtistController {
 
         model.addAttribute("artist", artist);
         model.addAttribute("title", "Fiche d'un artiste");
+        model.addAttribute("troupes", troupeService.findAll());
 
         return "artist/show";
     }
@@ -117,5 +127,33 @@ public class ArtistController {
         return "redirect:/artists";
     }
 
+    @PostMapping("/artists/{id}/affect-troupe")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String affectTroupe(
+            @PathVariable("id") long id,
+            @RequestParam(value = "troupeId", required = false) Long troupeId,
+            RedirectAttributes redir) {
+
+        Artist artist = service.getArtist(id);
+        if (artist == null) {
+            redir.addFlashAttribute("errorMessage", "Artiste introuvable.");
+            return "redirect:/artists";
+        }
+
+        if (troupeId == null) {
+            artist.setTroupe(null);
+        } else {
+            Troupe troupe = troupeService.findById(troupeId).orElse(null);
+            if (troupe == null) {
+                redir.addFlashAttribute("errorMessage", "Troupe introuvable.");
+                return "redirect:/artists";
+            }
+            artist.setTroupe(troupe);
+        }
+
+        service.updateArtist(id, artist);
+        redir.addFlashAttribute("successMessage", "Affiliation mise à jour avec succès.");
+        return "redirect:/artists";
+    }
 
 }

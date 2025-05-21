@@ -1,45 +1,39 @@
-<!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head>
-    <meta charset="UTF-8">
-    <title>Header Fragment</title>
-</head>
-<body>
 <header th:fragment="header" class="bg-gray-800 fixed top-0 w-full z-50 shadow">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
 
-            <!-- Logo -->
+            <!-- Logo & nav principale -->
             <div class="flex items-center space-x-8">
                 <a th:href="@{/}" class="text-white font-bold text-xl hover:text-blue-300 transition">
                     Réservation
                 </a>
 
-                <!-- Navigation principale -->
                 <nav class="hidden md:flex space-x-4">
                     <a th:href="@{/}"
                        th:classappend="${module == 'home'} ? 'bg-gray-900 text-white' : ''"
                        class="text-sm px-3 py-2 rounded-md hover:bg-gray-700 text-gray-300 hover:text-white">
                         Accueil
                     </a>
-
                     <a th:href="@{/shows}"
                        th:classappend="${module == 'shows'} ? 'bg-gray-900 text-white' : ''"
                        class="text-sm px-3 py-2 rounded-md hover:bg-gray-700 text-gray-300 hover:text-white">
                         Spectacles
                     </a>
-
                     <a th:href="@{/videos/artist/{name}(name='Marcelin')}"
                        class="text-sm px-3 py-2 rounded-md hover:bg-gray-700 text-gray-300 hover:text-white">
-                        Vidéos par artiste
+                        Vidéos
                     </a>
-
-                    <!-- 🛒 Lien vers le panier -->
                     <a th:href="@{/cart/view}"
                        th:classappend="${module == 'cart'} ? 'bg-gray-900 text-white' : ''"
                        class="text-sm px-3 py-2 rounded-md hover:bg-gray-700 text-gray-300 hover:text-white">
                         🛒 Mon panier
+                    </a>
+
+                    <!-- Nouveau : liste des artistes, réservé aux ADMIN -->
+                    <a sec:authorize="hasRole('ADMIN')"
+                       th:href="@{/artists}"
+                       class="text-sm px-3 py-2 rounded-md hover:bg-gray-700 text-gray-300 hover:text-white">
+                        Artistes
                     </a>
                 </nav>
             </div>
@@ -57,16 +51,15 @@
                        class="text-sm text-gray-300 hover:text-white px-3 py-2 rounded-md">
                         📄 Mes réservations
                     </a>
-
                     <span>Bonjour,</span>
                     <span sec:authentication="principal.username" class="font-semibold"></span>
                     <form th:action="@{/logout}" method="post" class="ml-2">
-                        <button type="submit" class="text-blue-400 hover:text-blue-500 text-sm">Se déconnecter</button>
+                        <button type="submit" class="text-blue-400 hover:text-blue-500 text-sm">
+                            Se déconnecter
+                        </button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 </header>
-</body>
-</html>

@@ -2,29 +2,20 @@
 
 ## Contexte du Projet
 
-Ce projet a été réalisé dans le cadre du cours Projet d'intégration de Développement du Bachelier en Informatique de Gestion, orientation développement d'applications à l'**ICC**. L'application permet aux utilisateurs de consulter la liste des spectacles, lire leur fiche détaillée, réserver des places et laisser des commentaires.
+Ce projet a été réalisé dans le cadre du cours Projet d'intégration de Développement du Bachelier en Informatique de
+Gestion, orientation développement d'applications à l'**ICC**. L'application permet aux utilisateurs de consulter la
+liste des spectacles, lire leur fiche détaillée, réserver des places et laisser des commentaires.
 
-## Membres du groupe de travail:
+## Membre:
 
-- Aktan Stéphane
-- Bah Elhadj S.
 - Nguyen Duy Anh
-- Nibigira Salix
-- El Azab Ousama
-- Amankour Mohamed 
 
 ## Fonctionnalités Principales
 
-- **Inscription et Authetification**  
-  Permet aux utilisateurs de créer un compte et de se connecter.
-- **Consulter la liste des spectacles et leurs détails**  
-  Les utilisateurs peuvent consulter la liste des spectacles et lire leur fiche détaillée.
-- **Réservation de places**  
-  Les utilisateurs peuvent réserver des places pour les spectacles.
-- **Gestion des commentaires**  
-  Les utilisateurs peuvent laisser des commentaires sur les spectacles.
+- **Affectation de troupe à un artiste en tant qu'admin**
 
 ## Technologies et Outils Utilisés
+
 - **Backend :**
     - Langage : Java
     - Framework : Spring Boot
@@ -32,11 +23,12 @@ Ce projet a été réalisé dans le cadre du cours Projet d'intégration de Dév
 - **Base de Données :**
     - MySQL via Wampserver
 - **Frontend :**
-    - HTML, CSS, Tailwind CSS, vue.js
+    - HTML, CSS, Tailwind CSS
 
 ## Installation et Exécution
 
 ### Prérequis
+
 - JDK 11 ou supérieur
 - IntelliJ IDEA
 - Wampserver (pour MySQL)
@@ -50,17 +42,24 @@ Ce projet a été réalisé dans le cadre du cours Projet d'intégration de Dév
 2. **Ouvrir le projet :**
    Importez le projet dans IntelliJ IDEA.
 3. **Configurer la base de données :**
-   Modifiez le fichier application.properties (ou application.yml) pour définir les paramètres de connexion à votre instance MySQL.
+   Modifiez le fichier application.properties (ou application.yml) pour définir les paramètres de connexion à votre
+   instance MySQL.
 4. **Lancer l'application :**
    Via IntelliJ IDEA en exécutant la classe principale contenant la méthode main.
    Ou via Maven avec la commande :
    ```bash
    mvn spring-boot:run
 5. **Accéder à l'application :**
+
 - Ouvrez http://localhost:8080 dans votre navigateur.
 - https://pid-reservation.onrender.com/
+
 6. **Front-end en cours (Vue.js) :**
    https://github.com/CyberAkr/pid-reservation-grp-front
+7. **Se connecter en Admin**
+   Login : bob & Password : 12345678
+8. **Consulter**
+   Localhost:8080/artists
 
 
 

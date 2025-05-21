@@ -1,0 +1,7 @@
+CREATE TABLE troupes
+(
+    id       BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name     VARCHAR(60)  NOT NULL UNIQUE,
+    logo_url VARCHAR(255) NOT NULL
+) ENGINE = InnoDB
+  CHARSET = utf8mb4;
