@@ -3,28 +3,35 @@
     <h1 class="text-3xl font-bold text-gray-800 mb-6">Gestion des Tags</h1>
 
     <!-- Formulaire d'ajout/modification -->
-    <form @submit.prevent="handleSubmit" class="mb-8 flex gap-3">
-      <input
-          v-model="tagForm.tag"
-          type="text"
-          placeholder="Nom du tag"
-          required
-          class="border px-3 py-1 rounded w-full"
-      />
-      <button
-          type="submit"
-          class="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700"
-      >
-        {{ tagForm.id ? 'Modifier' : 'Ajouter' }}
-      </button>
-      <button
-          v-if="tagForm.id"
-          type="button"
-          @click="resetForm"
-          class="text-sm text-gray-500 underline"
-      >
-        Annuler
-      </button>
+    <form @submit.prevent="handleSubmit" class="mb-8 flex flex-col gap-2">
+      <div class="flex gap-3">
+        <input
+            v-model="tagForm.tag"
+            type="text"
+            placeholder="Nom du tag (max 30 charactères)"
+            required
+            class="border px-3 py-1 rounded w-full"
+        />
+        <button
+            type="submit"
+            class="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700"
+        >
+          {{ tagForm.id ? 'Modifier' : 'Ajouter' }}
+        </button>
+        <button
+            v-if="tagForm.id"
+            type="button"
+            @click="resetForm"
+            class="text-sm text-gray-500 underline"
+        >
+          Annuler
+        </button>
+      </div>
+
+      <!-- Message d'erreur -->
+      <p v-if="errorMessage" class="text-red-600 text-sm mt-1">
+        {{ errorMessage }}
+      </p>
     </form>
 
     <!-- Liste des tags -->
@@ -69,7 +76,8 @@ export default {
       tagForm: {
         id: null,
         tag: ''
-      }
+      },
+      errorMessage: '' // 🔧 Message d'erreur ici
     };
   },
   mounted() {
@@ -85,20 +93,33 @@ export default {
       }
     },
     async handleSubmit() {
+      this.errorMessage = ''; // reset à chaque soumission
+
       try {
         if (this.tagForm.id) {
           await api.put(`/tags/${this.tagForm.id}`, this.tagForm);
         } else {
           await api.post('/tags', this.tagForm);
         }
+
         this.resetForm();
         this.fetchTags();
       } catch (error) {
-        console.error('Erreur sauvegarde tag:', error);
+        if (
+            error.response &&
+            error.response.status === 400 &&
+            error.response.data &&
+            typeof error.response.data.message === 'string'
+        ) {
+          this.errorMessage = error.response.data.message;
+        } else {
+          this.errorMessage = 'Une erreur est survenue lors de la sauvegarde.';
+        }
       }
     },
     editTag(tag) {
       this.tagForm = { ...tag };
+      this.errorMessage = '';
     },
     async deleteTag(id) {
       if (!confirm('Confirmer la suppression ?')) return;
@@ -111,6 +132,7 @@ export default {
     },
     resetForm() {
       this.tagForm = { id: null, tag: '' };
+      this.errorMessage = '';
     }
   }
 };

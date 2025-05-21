@@ -1,6 +1,8 @@
 package be.iccbxl.pid.reservationsspringboot.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.HashSet;
@@ -18,6 +20,8 @@ public class Tag {
     @EqualsAndHashCode.Include
     private Long id;
 
+    @Size(max=30, message = "Le nom du tag ne peut pas dépasser 30 caractères.")
+    @NotBlank(message = "Le nom du Tag est obligatoire.")
     @Column(length = 30, unique = true, nullable = false)
     private String tag;
 

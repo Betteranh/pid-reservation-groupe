@@ -28,6 +28,10 @@ public class Artist {
     @ManyToMany(mappedBy = "artists")
     private List<Type> types = new ArrayList<>();
 
+    @ManyToOne
+    @JoinColumn(name = "troupe_id", foreignKey = @ForeignKey(name = "fk_artist_troupe"))
+    private Troupe troupe;
+
     // Problème avec lombok !
     public Long getId() {
         return id;
@@ -45,12 +49,19 @@ public class Artist {
         return types;
     }
 
+    public Troupe getTroupe() {
+        return troupe;
+    }
+
+    public void setTroupe(Troupe troupe) {
+        this.troupe = troupe;
+    }
+
     public Artist addType(Type type) {
         if (!this.types.contains(type)) {
             this.types.add(type);
             type.addArtist(this);
         }
-
         return this;
     }
 
@@ -59,7 +70,6 @@ public class Artist {
             this.types.remove(type);
             type.getArtists().remove(this);
         }
-
         return this;
     }
 

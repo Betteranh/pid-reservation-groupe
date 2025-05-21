@@ -106,35 +106,112 @@
         <section class="mb-12">
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Collaborateurs</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700 text-sm">
+
+                <!-- AUTEURS -->
                 <div th:if="${collaborateurs['auteur']}">
                     <h3 class="font-semibold mb-1">Auteur(s)</h3>
                     <ul class="list-disc list-inside">
-                        <li th:each="a : ${collaborateurs['auteur']}"
-                            th:text="${a.firstname + ' ' + a.lastname}">
-                            Nom
+                        <li th:each="a : ${collaborateurs['auteur']}">
+                            <span th:text="${a.firstname + ' ' + a.lastname}">Nom</span>
+
+                            <span th:if="${a.troupe != null}">
+                        – <strong th:text="${a.troupe.name}"></strong>
+                        <img th:src="${a.troupe.logoUrl}" alt="Logo troupe" width="50" class="inline ml-2 align-middle"/>
+                    </span>
+                            <span th:if="${a.troupe == null}" class="italic text-gray-400">– Non affilié</span>
+
+                            <!-- Formulaire admin -->
+                            <div sec:authorize="hasRole('ADMIN')" class="mt-2">
+                                <form th:action="@{/dev/artists/{id}/troupe(id=${a.id})}" method="post" class="flex items-center gap-2 mt-1">
+                                    <select name="troupeId" class="border px-2 py-1 rounded text-sm">
+                                        <option value="">-- Non affilié --</option>
+                                        <option th:each="t : ${availableTroupes}"
+                                                th:value="${t.id}"
+                                                th:selected="${a.troupe != null and t.id == a.troupe.id}"
+                                                th:text="${t.name}">
+                                        </option>
+                                    </select>
+                                    <button type="submit"
+                                            class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm">
+                                        🔁
+                                    </button>
+                                </form>
+                            </div>
                         </li>
                     </ul>
                 </div>
+
+                <!-- SCÉNOGRAPHES -->
                 <div th:if="${collaborateurs['scénographe']}">
                     <h3 class="font-semibold mb-1">Metteur(s) en scène</h3>
                     <ul class="list-disc list-inside">
-                        <li th:each="s : ${collaborateurs['scénographe']}"
-                            th:text="${s.firstname + ' ' + s.lastname}">
-                            Nom
+                        <li th:each="s : ${collaborateurs['scénographe']}">
+                            <span th:text="${s.firstname + ' ' + s.lastname}">Nom</span>
+
+                            <span th:if="${s.troupe != null}">
+                        – <strong th:text="${s.troupe.name}"></strong>
+                        <img th:src="${s.troupe.logoUrl}" alt="Logo troupe" width="50" class="inline ml-2 align-middle"/>
+                    </span>
+                            <span th:if="${s.troupe == null}" class="italic text-gray-400">– Non affilié</span>
+
+                            <!-- Formulaire admin -->
+                            <div sec:authorize="hasRole('ADMIN')" class="mt-2">
+                                <form th:action="@{/dev/artists/{id}/troupe(id=${s.id})}" method="post" class="flex items-center gap-2 mt-1">
+                                    <select name="troupeId" class="border px-2 py-1 rounded text-sm">
+                                        <option value="">-- Non affilié --</option>
+                                        <option th:each="t : ${availableTroupes}"
+                                                th:value="${t.id}"
+                                                th:selected="${s.troupe != null and t.id == s.troupe.id}"
+                                                th:text="${t.name}">
+                                        </option>
+                                    </select>
+                                    <button type="submit"
+                                            class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm">
+                                        🔁
+                                    </button>
+                                </form>
+                            </div>
                         </li>
                     </ul>
                 </div>
+
+                <!-- COMÉDIENS -->
                 <div th:if="${collaborateurs['comédien']}">
                     <h3 class="font-semibold mb-1">Distribution</h3>
                     <ul class="list-disc list-inside">
-                        <li th:each="c : ${collaborateurs['comédien']}"
-                            th:text="${c.firstname + ' ' + c.lastname}">
-                            Nom
+                        <li th:each="c : ${collaborateurs['comédien']}">
+                            <span th:text="${c.firstname + ' ' + c.lastname}">Nom</span>
+
+                            <span th:if="${c.troupe != null}">
+                        – <strong th:text="${c.troupe.name}"></strong>
+                        <img th:src="${c.troupe.logoUrl}" alt="Logo troupe" width="50" class="inline ml-2 align-middle"/>
+                    </span>
+                            <span th:if="${c.troupe == null}" class="italic text-gray-400">– Non affilié</span>
+
+                            <!-- Formulaire admin -->
+                            <div sec:authorize="hasRole('ADMIN')" class="mt-2">
+                                <form th:action="@{/dev/artists/{id}/troupe(id=${c.id})}" method="post" class="flex items-center gap-2 mt-1">
+                                    <select name="troupeId" class="border px-2 py-1 rounded text-sm">
+                                        <option value="">-- Non affilié --</option>
+                                        <option th:each="t : ${availableTroupes}"
+                                                th:value="${t.id}"
+                                                th:selected="${c.troupe != null and t.id == c.troupe.id}"
+                                                th:text="${t.name}">
+                                        </option>
+                                    </select>
+                                    <button type="submit"
+                                            class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm">
+                                        🔁
+                                    </button>
+                                </form>
+                            </div>
                         </li>
                     </ul>
                 </div>
+
             </div>
         </section>
+
 
         <!-- Mots-clés & Formulaire d’ajout -->
         <section class="mb-12">
@@ -184,6 +261,74 @@
             </div>
         </section>
         <section>
+
+            <!-- Vidéos du spectacle -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Vidéos</h2>
+
+                <!-- Liste des vidéos -->
+                <div th:if="${videos != null and !#lists.isEmpty(videos)}" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div th:each="video : ${videos}" class="border border-gray-200 rounded-lg shadow-sm p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2" th:text="${video.title}">Titre de la vidéo</h3>
+                        <div class="aspect-w-16 aspect-h-9">
+                            <iframe th:if="${video.videoUrl != null and video.videoUrl.contains('embed/')}"
+                                    th:src="@{${video.videoUrl}}"
+                                    frameborder="0"
+                                    allowfullscreen
+                                    class="w-full h-64 rounded">
+                            </iframe>
+                            <p th:unless="${video.videoUrl != null and video.videoUrl.contains('embed/')}" class="text-red-500 text-sm">
+                                URL invalide ou non supportée.
+                            </p>
+
+                        </div>
+
+                        <!-- Bouton de suppression (admin uniquement) -->
+                        <div sec:authorize="hasRole('ADMIN')" class="mt-4 text-right">
+                            <form th:action="@{/dev/shows/{showId}/videos/{videoId}/delete(showId=${show.id}, videoId=${video.id})}" method="post"
+                                  onsubmit="return confirm('Supprimer cette vidéo ?');">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                <button type="submit"
+                                        class="text-red-600 hover:text-red-800 text-sm font-medium">
+                                    Supprimer 🗑️
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <p th:if="${#lists.isEmpty(videos)}" class="italic text-gray-500">
+                    Aucune vidéo pour ce spectacle.
+                </p>
+
+                <!-- Formulaire d'ajout de vidéo (admin only) -->
+                <div sec:authorize="hasRole('ADMIN')" class="mt-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Ajouter une vidéo</h3>
+                    <form th:action="@{/dev/shows/{id}/videos(id=${show.id})}" method="post" th:object="${newVideo}"
+                          class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 border border-gray-200 rounded p-4">
+                        <!-- Champ CSRF -->
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+                        <!-- Champ ID caché pour signaler que c'est un nouvel objet -->
+                        <input type="hidden" th:field="*{id}" value="0" />
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Titre</label>
+                            <input type="text" th:field="*{title}" class="w-full border px-3 py-2 rounded text-sm" required />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">URL YouTube</label>
+                            <input type="text" th:field="*{videoUrl}" class="w-full border px-3 py-2 rounded text-sm" required />
+                        </div>
+                        <div class="col-span-2">
+                            <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                                Ajouter la vidéo
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+
             <!-- Commentaires -->
             <div class="mb-12">
                 <h2 class="text-2xl font-bold text-gray-800 mb-4">Commentaires</h2>

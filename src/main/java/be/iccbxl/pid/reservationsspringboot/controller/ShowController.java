@@ -1,9 +1,8 @@
 package be.iccbxl.pid.reservationsspringboot.controller;
 
 import be.iccbxl.pid.reservationsspringboot.model.*;
-import be.iccbxl.pid.reservationsspringboot.service.ReviewService;
-import be.iccbxl.pid.reservationsspringboot.service.ShowService;
-import be.iccbxl.pid.reservationsspringboot.service.TagService;
+import be.iccbxl.pid.reservationsspringboot.service.*;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,6 +98,10 @@ public class ShowController {
         // 🔧 Ajouter les reviews au modèle sans toucher le reste du contrôleur
         model.addAttribute("reviews", reviewService.getReviewsByShowId(show.getId()));
 
+        model.addAttribute("videos", show.getVideos());
+        model.addAttribute("newVideo", new Video());
+
+        model.addAttribute("availableTroupes", troupeService.getAllTroupes());
         return "show/show";
     }
 
@@ -173,4 +176,98 @@ public class ShowController {
         cart.addItem(item);
         return "redirect:/cart/view";
     }
+
+    @Autowired
+    private be.iccbxl.pid.reservationsspringboot.repository.VideoRepository videoRepository;
+
+
+    @PostMapping("/dev/shows/{id}/videos")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
+    public String addVideoToShow(@PathVariable("id") String id,
+                                 @ModelAttribute("newVideo") Video video,
+                                 RedirectAttributes redirectAttributes) {
+
+        Show show = service.getWithAssociations(id);
+        if (show == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Spectacle introuvable.");
+            return "redirect:/dev/shows/" + id;
+        }
+
+        // Forcer id à 0 pour éviter le conflit d’objet détaché
+        video.setId(0);
+
+        // Convertir automatiquement l’URL YouTube
+        String url = video.getVideoUrl();
+        if (url.contains("watch?v=")) {
+            url = url.replace("watch?v=", "embed/");
+            video.setVideoUrl(url);
+        }
+
+        video.setShow(show);
+        videoRepository.save(video);
+
+        redirectAttributes.addFlashAttribute("successMessage", "Vidéo ajoutée !");
+        return "redirect:/dev/shows/" + id;
+    }
+
+
+
+
+    @PostMapping("/dev/shows/{showId}/videos/{videoId}/delete")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
+    public String deleteVideo(@PathVariable("showId") Long showId,
+                              @PathVariable("videoId") Long videoId,
+                              RedirectAttributes redirectAttributes) {
+
+        Optional<Video> videoOpt = videoRepository.findById(videoId);
+        if (videoOpt.isPresent()) {
+            videoRepository.delete(videoOpt.get());
+            redirectAttributes.addFlashAttribute("successMessage", "Vidéo supprimée !");
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Vidéo introuvable.");
+        }
+
+        return "redirect:/dev/shows/" + showId;
+    }
+    @Autowired
+    private TroupeService troupeService;
+
+    @Autowired
+    private ArtistService artistService;
+    @PostMapping("/dev/artists/{id}/troupe")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String updateArtistTroupe(@PathVariable Long id,
+                                     @RequestParam(required = false) Long troupeId,
+                                     RedirectAttributes redirectAttributes,
+                                     HttpServletRequest request) {
+
+        Artist artist = artistService.getArtist(id);
+        if (artist == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Artiste introuvable.");
+            return "redirect:/shows";
+        }
+
+        Troupe troupe = null;
+        if (troupeId != null) {
+            troupe = troupeService.getTroupeById(troupeId).orElse(null);
+        }
+        artist.setTroupe(troupe);
+
+        artistService.updateArtist(id, artist);
+
+        redirectAttributes.addFlashAttribute("successMessage",
+                "Troupe modifiée pour " + artist.getFirstname() + " " + artist.getLastname());
+
+        String referer = request.getHeader("Referer");
+
+        return "redirect:" + (referer != null ? referer : "/shows");
+    }
+
+
+
+
+
+
 }

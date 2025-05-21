@@ -13,7 +13,7 @@
             <a v-if="isAuthenticated" href="/cart/view" class="text-gray-300 hover:text-white">🛒 Mon panier</a>
             <a v-if="isAuthenticated" href="/my-reservations" class="text-gray-300 hover:text-white">📄 Mes réservations</a>
 
-            <!-- ✅ Lien admin vers backend -->
+            
             <a
                 v-if="roles.includes('ROLE_ADMIN')"
                 href="/admin/shows"

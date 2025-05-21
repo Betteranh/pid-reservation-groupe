@@ -3,11 +3,14 @@ package be.iccbxl.pid.reservationsspringboot.model;
 import com.github.slugify.Slugify;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+import be.iccbxl.pid.reservationsspringboot.model.Video;
 
 @Data
 @Entity
@@ -294,5 +297,19 @@ public class Show {
                 .findFirst()
                 .orElse("Aucune date");
     }
+
+
+
+    @OneToMany(mappedBy = "show", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Video> videos = new ArrayList<>();
+
+    public List<Video> getVideos() {
+        return videos;
+    }
+
+    public void setVideos(List<Video> videos) {
+        this.videos = videos;
+    }
+
 
 }
